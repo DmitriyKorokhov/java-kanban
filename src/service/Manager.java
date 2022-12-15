@@ -44,7 +44,6 @@ public class Manager {
     }
 
     public void outputAllTasks(){
-        System.out.println("Список всех задач: ");
         for (Task value : taskTable.values()) {
             System.out.println(value);
         }
@@ -52,7 +51,7 @@ public class Manager {
 
     public void clearAllTasks(){
         taskTable.clear();
-        System.out.println(taskTable.values());
+
     }
 
     public Task outputByIdTask(Integer id){
@@ -80,7 +79,6 @@ public class Manager {
     }
 
     public void outputAllEpics() {
-        System.out.println("Список всех Epic задач: ");
         for (Epic value : epicTable.values()) {
             System.out.println(value);
         }
@@ -88,7 +86,7 @@ public class Manager {
 
     public void clearAllEpics(){
         epicTable.clear();
-        System.out.println(epicTable.values());
+        clearAllSubtasks();
     }
 
     public Epic outputByIdEpic(Integer id){
@@ -98,13 +96,20 @@ public class Manager {
 
     public Epic clearByIdEpic(Integer id){
         Epic epic = epicTable.remove(id);
-        System.out.println("Эпик с id = " + id + " удалена");
+        System.out.println("Эпик с id = " + id + " удален");
+        ArrayList<Integer> idSubtask = mapIdSubtaskByEpic.get(id);
+        for (Integer integer : idSubtask) {
+                   subtaskTable.remove(integer);
+        }
         return epic;
     }
+
+    public HashMap<Integer, ArrayList<Integer>> mapIdSubtaskByEpic = new HashMap<>();
 
     public HashMap<Integer, String> mapStatusSubtask = new HashMap<>();
 
     public int saveSubtask(Subtask subtask, Epic epic, ArrayList<Integer> epicListId){
+        mapIdSubtaskByEpic.put(epic.getTaskId(), epicListId);
         mapStatusSubtask.put(subId, subtask.subtaskStatus);
         subtask.setEpicId(subId);
         epicListId.add(subId);
@@ -134,7 +139,6 @@ public class Manager {
     }
 
     public void outputAllSubtasks() {
-        System.out.println("Список всех подзадач: ");
         for (Subtask value : subtaskTable.values()) {
             System.out.println(value);
         }
@@ -142,22 +146,20 @@ public class Manager {
 
     public void clearAllSubtasks(){
         subtaskTable.clear();
-        System.out.println(subtaskTable.values());
     }
 
-    public Task outputByIdSubtasks(Integer id){
+    public Subtask outputByIdSubtasks(Integer id){
         Subtask subtask = subtaskTable.get(id);
         return subtask;
     }
 
-    public Task clearByIdSubtasks(Integer id){
+    public Subtask clearByIdSubtasks(Integer id){
         Subtask subtask = subtaskTable.remove(id);
         System.out.println("Подадача с id = " + id + " удалена");
         return subtask;
     }
 
     public void SubtaskByEpic(ArrayList<Integer> epicListId){
-        System.out.println("Подзадачи определенного эпика");
         for (Integer integer : epicListId) {
             for (Integer key : subtaskTable.keySet()) {
                 if(integer.equals(key)){
