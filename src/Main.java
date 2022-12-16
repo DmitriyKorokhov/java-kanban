@@ -109,7 +109,6 @@ public class Main {
         manager.saveSubtask(subtaskTwo2, epicTwo, epicTwo.getEpicListId());
         System.out.println("Вывод всех подзадач");
         manager.outputAllSubtasks();
-        manager.VVMap();
         System.out.println(epicOne.getEpicListId());
         System.out.println(epicTwo.getEpicListId());
         System.out.println("Определение статуса 2 эпика");

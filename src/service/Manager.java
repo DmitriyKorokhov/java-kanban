@@ -14,6 +14,7 @@ public class Manager {
     protected HashMap<Integer, Subtask> subtaskTable;
     protected HashMap<Integer, Epic> epicTable;
     protected HashMap<Integer, Task> taskTable;
+
     public Manager() {
         subId = 0;
         epicId = 0;
@@ -55,8 +56,7 @@ public class Manager {
     }
 
     public Task outputByIdTask(Integer id){
-        Task task = taskTable.get(id);
-        return task;
+        return taskTable.get(id);
     }
 
     public Task clearByIdTask(Integer id){
@@ -90,8 +90,7 @@ public class Manager {
     }
 
     public Epic outputByIdEpic(Integer id){
-        Epic epic = epicTable.get(id);
-        return epic;
+        return epicTable.get(id);
     }
 
     public Epic clearByIdEpic(Integer id){
@@ -117,10 +116,6 @@ public class Manager {
         subtaskTable.put(subtask.getEpicId(), subtask);
         this.subId++;
         return subId;
-    }
-
-    public void VVMap(){
-        System.out.println(mapStatusSubtask);
     }
 
     public void updateSubtask(Subtask subtask){
@@ -149,8 +144,7 @@ public class Manager {
     }
 
     public Subtask outputByIdSubtasks(Integer id){
-        Subtask subtask = subtaskTable.get(id);
-        return subtask;
+        return subtaskTable.get(id);
     }
 
     public Subtask clearByIdSubtasks(Integer id){

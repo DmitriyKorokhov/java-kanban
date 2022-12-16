@@ -10,7 +10,6 @@ public class Task {
         this.taskTitle = taskTitle;
         this.taskSpecification = taskSpecification;
         taskStatus = "NEW";
-        taskId = taskId;
     }
 
     public String getTaskTitle() {
