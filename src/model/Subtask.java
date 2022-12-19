@@ -1,13 +1,15 @@
 package model;
 
+import service.Status;
+
 public class Subtask extends Task{
     private int epicId;
-    public String subtaskStatus;
+    public Status subtaskStatus;
 
     public Subtask(String mainTask, String mainSpecification, Integer epicId) {
         super(mainTask, mainSpecification);
         this.epicId = epicId;
-        subtaskStatus = "NEW";
+        subtaskStatus = Status.NEW;
     }
 
     public int getEpicId() {
@@ -16,14 +18,6 @@ public class Subtask extends Task{
 
     public void setEpicId(int epicId) {
         this.epicId = epicId;
-    }
-
-    public String getSubtaskStatus() {
-        return subtaskStatus;
-    }
-
-    public void setSubtaskStatus(String subTaskStatus) {
-        this.subtaskStatus = subTaskStatus;
     }
 
     @Override
@@ -54,5 +48,13 @@ public class Subtask extends Task{
                 ", SubTaskStatus='" + getSubtaskStatus() + '\'' +
                 ", SubTaskId=" + epicId +
                 '}';
+    }
+
+    public Status getSubtaskStatus() {
+        return subtaskStatus;
+    }
+
+    public void setSubtaskStatus(Status subtaskStatus) {
+        this.subtaskStatus = subtaskStatus;
     }
 }

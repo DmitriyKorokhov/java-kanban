@@ -1,15 +1,20 @@
 package model;
 
+import service.Status;
+
 import java.util.ArrayList;
 
 public class Epic extends Task{
     private ArrayList<Integer> epicListId;
-    private String epicStatus;
-    public Epic(String mainTask, String mainSpecification) {
-        super(mainTask, mainSpecification);
+
+    private Status epicStatus;
+
+    public Epic(String taskTitle, String taskSpecification) {
+        super(taskTitle, taskSpecification);
         epicListId = new ArrayList<>();
-        epicStatus = "NEW";
+        epicStatus = Status.NEW;
     }
+
 
     @Override
     public String getTaskTitle() {
@@ -49,11 +54,12 @@ public class Epic extends Task{
         this.epicListId = epicListId;
     }
 
-    public String getEpicStatus() {
+
+    public Status getEpicStatus() {
         return epicStatus;
     }
 
-    public void setEpicStatus(String epicStatus) {
+    public void setEpicStatus(Status epicStatus) {
         this.epicStatus = epicStatus;
     }
 }

@@ -1,7 +1,8 @@
 import model.Epic;
 import model.Subtask;
 import model.Task;
-import service.Manager;
+import service.Managers;
+import service.TaskManager;
 
 import java.util.Scanner;
 
@@ -58,7 +59,8 @@ public class Main {
         String epicSpecificationThree = "Данный epic нужен для оценки работоспособности менеджера";
         Epic epicThree = new Epic(epicTitleThree, epicSpecificationThree);
 
-        Manager manager = new Manager();
+        TaskManager manager = Managers.getDefault();
+
         System.out.println("Добавление задачи 1");
         manager.saveTask(taskOne);
         System.out.println("Добавление задачи 2");
@@ -73,14 +75,14 @@ public class Main {
         manager.saveTask(taskThree);
         System.out.println("Вывод всех задач");
         manager.outputAllTasks();
-        System.out.println("Введите id, чтобы вывести задачу по идентификатору");
-        Integer outputIdTask = scanner.nextInt();
-        System.out.println(manager.outputByIdTask(outputIdTask));
-        System.out.println("Введите id, чтобы удалить задачу по идентификатору");
-        Integer removeIdTask = scanner.nextInt();
-        System.out.println(manager.clearByIdTask(removeIdTask));
+        System.out.println("Вывожу задачу с id = 1");
+        System.out.println(manager.outputByIdTask(1));
+        System.out.println("Удаляю задачу с id = 0");
+        System.out.println(manager.clearByIdTask(0));
         System.out.println("Вывод всех задач");
         manager.outputAllTasks();
+        System.out.println("Вывод истории");
+        System.out.println(manager.getHistory());
         System.out.println("Добавление эпика 1");
         manager.saveEpic(epicOne);
         System.out.println("Вывод всех эпиков");
@@ -119,28 +121,28 @@ public class Main {
         manager.outputAllEpics();
         System.out.println("Вывод подзадач по 2 эпику");
         manager.SubtaskByEpic(epicTwo.getEpicListId());
-        System.out.println("Введите id, чтобы удалить эпик по идентификатору");
-        Integer removeIdEpic = scanner.nextInt();
+        System.out.println("Удаляю эпик с  id = 0");
         System.out.println("Удаление эпика и его подзадач");
-        manager.clearByIdEpic(removeIdEpic);
+        manager.clearByIdEpic(0);
         System.out.println("Вывод всех эпиков");
         manager.outputAllEpics();
         System.out.println("Вывод всех подзадач");
         manager.outputAllSubtasks();
-        System.out.println("Введите id, чтобы вывести подзадачу по идентификатору");
-        Integer outputIdSubtask = scanner.nextInt();
-        System.out.println(manager.outputByIdSubtasks(outputIdSubtask));
-        System.out.println("Введите id, чтобы удалить подзадачу по идентификатору");
-        Integer removeIdSubtask = scanner.nextInt();
-        System.out.println(manager.clearByIdSubtasks(removeIdSubtask));
+        System.out.println("Вывожу подзадачу с id = 3");
+        System.out.println(manager.outputByIdSubtasks(3));
+        System.out.println("Вывод истории");
+        System.out.println(manager.getHistory());
+        System.out.println("Удаляю подзадачу с id = 2");
+        System.out.println(manager.clearByIdSubtasks(2));
         System.out.println("Вывод всех подзадач");
         manager.outputAllSubtasks();
-        System.out.println("Введите id, чтобы вывести эпик по идентификатору");
-        Integer outputIdEpic = scanner.nextInt();
-        System.out.println(manager.outputByIdEpic(outputIdEpic));
+        System.out.println("Вывожу эпик с id = 1");
+        System.out.println(manager.outputByIdEpic(1));
+        System.out.println("Вывод истории");
+        System.out.println(manager.getHistory());
         System.out.println("Удаление всех эпиков");
         manager.clearAllEpics();
-        System.out.println("Вывод всех эпиков и соответственно всех задач");
+        System.out.println("Вывод всех эпиков и соответственно всех подзадач");
         manager.outputAllEpics();
         System.out.println("Удаление всех задач");
         manager.clearAllTasks();
