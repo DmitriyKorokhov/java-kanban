@@ -1,7 +1,5 @@
 package model;
 
-import service.Status;
-
 import java.util.ArrayList;
 
 public class Epic extends Task{
@@ -15,6 +13,22 @@ public class Epic extends Task{
         epicStatus = Status.NEW;
     }
 
+    public ArrayList<Integer> getEpicListId() {
+        return epicListId;
+    }
+
+    public void setEpicListId(ArrayList<Integer> epicListId) {
+        this.epicListId = epicListId;
+    }
+
+
+    public Status getEpicStatus() {
+        return epicStatus;
+    }
+
+    public void setEpicStatus(Status epicStatus) {
+        this.epicStatus = epicStatus;
+    }
 
     @Override
     public String getTaskTitle() {
@@ -44,22 +58,5 @@ public class Epic extends Task{
                 ", epicStatus='" + epicStatus + '\'' +
                 ", epicId=" + getTaskId() +
                 '}';
-    }
-
-    public ArrayList<Integer> getEpicListId() {
-        return epicListId;
-    }
-
-    public void setEpicListId(ArrayList<Integer> epicListId) {
-        this.epicListId = epicListId;
-    }
-
-
-    public Status getEpicStatus() {
-        return epicStatus;
-    }
-
-    public void setEpicStatus(Status epicStatus) {
-        this.epicStatus = epicStatus;
     }
 }

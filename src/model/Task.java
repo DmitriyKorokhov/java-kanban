@@ -1,7 +1,5 @@
 package model;
 
-import service.Status;
-
 public class Task {
     private String taskTitle;
     private String taskSpecification;
@@ -38,6 +36,14 @@ public class Task {
         this.taskId = taskId;
     }
 
+    public Status getTaskStatus() {
+        return taskStatus;
+    }
+
+    public void setTaskStatus(Status taskStatus) {
+        this.taskStatus = taskStatus;
+    }
+
     @Override
     public String toString() {
         return "Task{" +
@@ -46,14 +52,6 @@ public class Task {
                 ", taskStatus='" + taskStatus + '\'' +
                 ", taskId=" + taskId +
                 '}';
-    }
-
-    public Status getTaskStatus() {
-        return taskStatus;
-    }
-
-    public void setTaskStatus(Status taskStatus) {
-        this.taskStatus = taskStatus;
     }
 }
 

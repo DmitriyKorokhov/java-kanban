@@ -4,13 +4,9 @@ import model.Task;
 import service.Managers;
 import service.TaskManager;
 
-import java.util.Scanner;
-
 public class Main {
 
     public static void main(String[] args) {
-        Scanner scanner = new Scanner(System.in);
-
         String taskTitleOne = "Переезд";
         String taskSpecificationOne = "Я перезжаю в новую квартиру, мне нужно спланировать, как я буду перевозить вещи";
         Task taskOne = new Task(taskTitleOne, taskSpecificationOne);
@@ -23,9 +19,37 @@ public class Main {
         String taskSpecificationThree = "План выполнен в совершенстве";
         Task taskThree = new Task(taskTitleThree, taskSpecificationThree);
 
-        String taskTitleFour = "Переезд";
-        String taskSpecificationFour = "Забыл некоторые вещи в старой кваритре";
+        String taskTitleNew = "Переезд";
+        String taskSpecificationNew = "Забыл некоторые вещи в старой кваритре";
+        Task taskNew = new Task(taskTitleNew, taskSpecificationNew);
+
+        String taskTitleFour = "Переезд - 4";
+        String taskSpecificationFour = "Снова забыл некоторые вещи в старой кваритре";
         Task taskFour = new Task(taskTitleFour, taskSpecificationFour);
+
+        String taskTitleFive = "Переезд - 5";
+        String taskSpecificationFive = "Еще рваз забыл некоторые вещи в старой кваритре";
+        Task taskFive = new Task(taskTitleFive, taskSpecificationFive);
+
+        String taskTitleSix = "Переезд - 6";
+        String taskSpecificationSix = "И вновь я забыл некоторые вещи в старой кваритре";
+        Task taskSix = new Task(taskTitleSix, taskSpecificationSix);
+
+        String taskTitleSeven = "Переезд - 7";
+        String taskSpecificationSeven = "Повторно забыл некоторые вещи в старой кваритре";
+        Task taskSeven = new Task(taskTitleSeven, taskSpecificationSeven);
+
+        String taskTitleEight = "Переезд - 8";
+        String taskSpecificationEight = "В который раз забыл некоторые вещи в старой кваритре";
+        Task taskEight = new Task(taskTitleEight, taskSpecificationEight);
+
+        String taskTitleNine = "Переезд - 9";
+        String taskSpecificationNine = "В очередной раз я забыл некоторые вещи в старой кваритре";
+        Task taskNine = new Task(taskTitleNine, taskSpecificationNine);
+
+        String taskTitleTen = "Переезд - 10";
+        String taskSpecificationTen = "Опять-таки я забыл некоторые вещи в старой кваритре";
+        Task taskTen = new Task(taskTitleTen, taskSpecificationTen);
 
         String epicTitleOne = "Сбор коробок";
         String epicSpecificationOne = "Мне нужно собрать много вещей и распределить по коробкам";
@@ -68,7 +92,7 @@ public class Main {
         System.out.println("Вывод всех задач");
         manager.outputAllTasks();
         System.out.println("Обновление задачи 2");
-        manager.updateTask(taskFour);
+        manager.updateTask(taskNew);
         System.out.println("Вывод всех задач");
         manager.outputAllTasks();
         System.out.println("Добавление задачи 3");
@@ -77,12 +101,12 @@ public class Main {
         manager.outputAllTasks();
         System.out.println("Вывожу задачу с id = 1");
         System.out.println(manager.outputByIdTask(1));
+        System.out.println("Вывод истории");
+        System.out.println(manager.getHistory());
         System.out.println("Удаляю задачу с id = 0");
         System.out.println(manager.clearByIdTask(0));
         System.out.println("Вывод всех задач");
         manager.outputAllTasks();
-        System.out.println("Вывод истории");
-        System.out.println(manager.getHistory());
         System.out.println("Добавление эпика 1");
         manager.saveEpic(epicOne);
         System.out.println("Вывод всех эпиков");
@@ -111,8 +135,6 @@ public class Main {
         manager.saveSubtask(subtaskTwo2, epicTwo, epicTwo.getEpicListId());
         System.out.println("Вывод всех подзадач");
         manager.outputAllSubtasks();
-        System.out.println(epicOne.getEpicListId());
-        System.out.println(epicTwo.getEpicListId());
         System.out.println("Определение статуса 2 эпика");
         manager.epicStatus(epicTwo, epicTwo.getEpicListId());
         System.out.println("Определение статуса 1 эпика");
@@ -128,17 +150,55 @@ public class Main {
         manager.outputAllEpics();
         System.out.println("Вывод всех подзадач");
         manager.outputAllSubtasks();
-        System.out.println("Вывожу подзадачу с id = 3");
-        System.out.println(manager.outputByIdSubtasks(3));
+        System.out.println("Вывожу подзадачу с id = 7. Данной подзадачи не существует. В выводе подзадачи и истории это отображается");
+        System.out.println(manager.outputByIdSubtasks(7));
         System.out.println("Вывод истории");
         System.out.println(manager.getHistory());
         System.out.println("Удаляю подзадачу с id = 2");
         System.out.println(manager.clearByIdSubtasks(2));
         System.out.println("Вывод всех подзадач");
         manager.outputAllSubtasks();
-        System.out.println("Вывожу эпик с id = 1");
-        System.out.println(manager.outputByIdEpic(1));
+        System.out.println("Ранее эпик с id = 0 был удален. В выводе эпика и истории это отображается");
+        System.out.println("Вывожу эпик с id = 0");
+        System.out.println(manager.outputByIdEpic(0));
         System.out.println("Вывод истории");
+        System.out.println(manager.getHistory());
+        System.out.println("Проверка на работу ограничителя истории в 10 элементов. Сейчас в истории 3 элемента");
+        System.out.println("Добавление задачи 4");
+        manager.saveTask(taskFour);
+        System.out.println("Добавление задачи 5");
+        manager.saveTask(taskFive);
+        System.out.println("Добавление задачи 6");
+        manager.saveTask(taskSix);
+        System.out.println("Добавление задачи 7");
+        manager.saveTask(taskSeven);
+        System.out.println("Добавление задачи 8");
+        manager.saveTask(taskEight);
+        System.out.println("Добавление задачи 9");
+        manager.saveTask(taskNine);
+        System.out.println("Добавление задачи 10");
+        manager.saveTask(taskTen);
+        System.out.println("Вывод всех задач");
+        manager.outputAllTasks();
+        System.out.println("Вывожу задачу с id = 1");
+        System.out.println(manager.outputByIdTask(1));
+        System.out.println("Вывожу задачу с id = 2");
+        System.out.println(manager.outputByIdTask(2));
+        System.out.println("Вывожу задачу с id = 4");
+        System.out.println(manager.outputByIdTask(4));
+        System.out.println("Вывожу задачу с id = 5");
+        System.out.println(manager.outputByIdTask(5));
+        System.out.println("Вывожу задачу с id = 6");
+        System.out.println(manager.outputByIdTask(6));
+        System.out.println("Вывожу задачу с id = 7");
+        System.out.println(manager.outputByIdTask(7));
+        System.out.println("Вывожу задачу с id = 8 - 10 элемент");
+        System.out.println(manager.outputByIdTask(8));
+        System.out.println("Вывод истории");
+        System.out.println(manager.getHistory());
+        System.out.println("Вывожу задачу с id = 9 - 11 элемент");
+        System.out.println(manager.outputByIdTask(9));
+        System.out.println("Вывод истории, т.к. должно быть 10 элементов: первый элемент был удален");
         System.out.println(manager.getHistory());
         System.out.println("Удаление всех эпиков");
         manager.clearAllEpics();

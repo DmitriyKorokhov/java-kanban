@@ -1,6 +1,7 @@
 package service;
 
 import model.Epic;
+import model.Status;
 import model.Subtask;
 import model.Task;
 
@@ -9,12 +10,12 @@ import java.util.HashMap;
 import java.util.List;
 
 public class InMemoryTaskManager implements TaskManager {
-    protected int subId;
-    protected int epicId;
-    protected int taskId;
-    protected HashMap<Integer, Subtask> subtaskTable;
-    protected HashMap<Integer, Epic> epicTable;
-    protected HashMap<Integer, Task> taskTable;
+    private int subId;
+    private int epicId;
+    private int taskId;
+    private HashMap<Integer, Subtask> subtaskTable;
+    private HashMap<Integer, Epic> epicTable;
+    private HashMap<Integer, Task> taskTable;
 
     public InMemoryTaskManager() {
         subId = 0;
@@ -60,8 +61,10 @@ public class InMemoryTaskManager implements TaskManager {
 
     @Override
     public Task outputByIdTask(Integer id){
-        historyManager.add(taskTable.get(id));
-        return taskTable.get(id);
+        historyManager.add(taskTable.getOrDefault(id, new Task("Задача отсутствует",
+                "Задача с данным id удалена или не вводилась")));
+        return taskTable.getOrDefault(id, new Task("Задача отсутствует",
+                "Задача с данным id удалена или не вводилась"));
     }
 
     @Override
@@ -101,8 +104,10 @@ public class InMemoryTaskManager implements TaskManager {
 
     @Override
     public Epic outputByIdEpic(Integer id){
-        historyManager.add(epicTable.get(id));
-        return epicTable.get(id);
+        historyManager.add(epicTable.getOrDefault(id, new Epic("Епик отсутствует",
+                "Епик с данным id удален или не вводился")));
+        return epicTable.getOrDefault(id, new Epic("Епик отсутствует",
+                "Епик с данным id удален или не вводился"));
     }
 
     @Override
@@ -116,9 +121,9 @@ public class InMemoryTaskManager implements TaskManager {
         return epic;
     }
 
-    public HashMap<Integer, ArrayList<Integer>> mapIdSubtaskByEpic = new HashMap<>();
+    private HashMap<Integer, ArrayList<Integer>> mapIdSubtaskByEpic = new HashMap<>();
 
-    public HashMap<Integer, Status> mapStatusSubtask = new HashMap<>();
+    private HashMap<Integer, Status> mapStatusSubtask = new HashMap<>();
 
     @Override
     public int saveSubtask(Subtask subtask, Epic epic, ArrayList<Integer> epicListId){
@@ -160,9 +165,10 @@ public class InMemoryTaskManager implements TaskManager {
 
     @Override
     public Subtask outputByIdSubtasks(Integer id){
-        historyManager.add(subtaskTable.get(id));
-        //historyTasks.add(subtaskTable.get(id));
-        return subtaskTable.get(id);
+        historyManager.add(subtaskTable.getOrDefault(id, new Subtask("Подзадача отсутствует",
+                "Подзадача с данным id удалена или не вводилась", id)));
+        return subtaskTable.getOrDefault(id, new Subtask("Подзадача отсутствует",
+                "Подзадача с данным id удалена или не вводилась", id));
     }
 
     @Override
