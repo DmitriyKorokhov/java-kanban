@@ -10,6 +10,7 @@ import java.util.HashMap;
 import java.util.List;
 
 public class InMemoryTaskManager implements TaskManager {
+    // К Вашему комментарию: Исправил модификаторы доступа.
     private int subId;
     private int epicId;
     private int taskId;
