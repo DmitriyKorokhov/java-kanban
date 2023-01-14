@@ -49,4 +49,6 @@ public interface TaskManager {
     void epicStatus(Epic epic , ArrayList<Integer> epicListId);
 
     List<Task> getHistory();
+
+   void removeHistoryById(int id);
 }

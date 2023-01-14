@@ -1,21 +1,11 @@
 package model;
 
 public class Subtask extends Task{
-    private int epicId;
     public Status subtaskStatus;
 
-    public Subtask(String mainTask, String mainSpecification, Integer epicId) {
+    public Subtask(String mainTask, String mainSpecification) {
         super(mainTask, mainSpecification);
-        this.epicId = epicId;
         subtaskStatus = Status.NEW;
-    }
-
-    public int getEpicId() {
-        return epicId;
-    }
-
-    public void setEpicId(int epicId) {
-        this.epicId = epicId;
     }
 
     public Status getSubtaskStatus() {
@@ -52,7 +42,7 @@ public class Subtask extends Task{
                 "SubTaskTitle='" + getTaskTitle() + '\'' +
                 ", SubTaskSpecification='" + getTaskSpecification()+ '\'' +
                 ", SubTaskStatus='" + getSubtaskStatus() + '\'' +
-                ", SubTaskId=" + epicId +
+                ", SubTaskId=" + getTaskId() +
                 '}';
     }
 }

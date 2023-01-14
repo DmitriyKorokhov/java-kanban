@@ -10,22 +10,15 @@ import java.util.HashMap;
 import java.util.List;
 
 public class InMemoryTaskManager implements TaskManager {
-    // К Вашему комментарию: Исправил модификаторы доступа.
-    private int subId;
-    private int epicId;
-    private int taskId;
-    private HashMap<Integer, Subtask> subtaskTable;
-    private HashMap<Integer, Epic> epicTable;
-    private HashMap<Integer, Task> taskTable;
+    private int taskId = 0;
+    private final HashMap<Integer, Subtask> subtaskTable = new HashMap<>();
+    private final HashMap<Integer, Epic> epicTable = new HashMap<>();
+    private final HashMap<Integer, Task> taskTable = new HashMap<>();
 
-    public InMemoryTaskManager() {
-        subId = 0;
-        epicId = 0;
-        taskId = 0;
-        taskTable = new HashMap<>();
-        epicTable = new HashMap<>();
-        subtaskTable = new HashMap<>();
-    }
+    private final HistoryManager historyManager = Managers.getDefaultHistory();
+
+    private HashMap<Integer, ArrayList<Integer>> mapIdSubtaskByEpic = new HashMap<>();
+    private HashMap<Integer, Status> mapStatusSubtask = new HashMap<>();
 
     @Override
     public int saveTask(Task task){
@@ -77,15 +70,15 @@ public class InMemoryTaskManager implements TaskManager {
 
     @Override
     public int saveEpic(Epic epic){
-        epic.setTaskId(epicId);
+        epic.setTaskId(taskId);
         epicTable.put(epic.getTaskId(), epic);
-        this.epicId++;
-        return epicId;
+        this.taskId++;
+        return taskId;
     }
 
     @Override
     public void updateEpic(Epic epic){
-        int id = epicId - 1;
+        int id = taskId - 1;
         epicTable.put(id, epic);
         epic.setTaskId(id);
     }
@@ -122,27 +115,23 @@ public class InMemoryTaskManager implements TaskManager {
         return epic;
     }
 
-    private HashMap<Integer, ArrayList<Integer>> mapIdSubtaskByEpic = new HashMap<>();
-
-    private HashMap<Integer, Status> mapStatusSubtask = new HashMap<>();
-
     @Override
     public int saveSubtask(Subtask subtask, Epic epic, ArrayList<Integer> epicListId){
         mapIdSubtaskByEpic.put(epic.getTaskId(), epicListId);
-        mapStatusSubtask.put(subId, subtask.subtaskStatus);
-        subtask.setEpicId(subId);
-        epicListId.add(subId);
+        mapStatusSubtask.put(taskId, subtask.subtaskStatus);
+        subtask.setTaskId(taskId);
+        epicListId.add(taskId);
         epic.setEpicListId(epicListId);
-        subtaskTable.put(subtask.getEpicId(), subtask);
-        this.subId++;
-        return subId;
+        subtaskTable.put(subtask.getTaskId(), subtask);
+        this.taskId++;
+        return taskId;
     }
 
     @Override
     public void updateSubtask(Subtask subtask){
-        int id = subId - 1;
+        int id = taskId - 1;
         subtaskTable.put(id, subtask);
-        subtask.setEpicId(id);
+        subtask.setTaskId(id);
         if (subtask.getSubtaskStatus().equals(Status.NEW)){
             subtask.setSubtaskStatus(Status.IN_PROGRESS);
             mapStatusSubtask.put(id, Status.IN_PROGRESS);
@@ -167,9 +156,9 @@ public class InMemoryTaskManager implements TaskManager {
     @Override
     public Subtask outputByIdSubtasks(Integer id){
         historyManager.add(subtaskTable.getOrDefault(id, new Subtask("Подзадача отсутствует",
-                "Подзадача с данным id удалена или не вводилась", id)));
+                "Подзадача с данным id удалена или не вводилась")));
         return subtaskTable.getOrDefault(id, new Subtask("Подзадача отсутствует",
-                "Подзадача с данным id удалена или не вводилась", id));
+                "Подзадача с данным id удалена или не вводилась"));
     }
 
     @Override
@@ -211,10 +200,19 @@ public class InMemoryTaskManager implements TaskManager {
         }
     }
 
-    HistoryManager historyManager = Managers.getDefaultHistory();
-
     @Override
     public List<Task> getHistory(){
         return historyManager.getHistory();
+    }
+
+    @Override
+    public void removeHistoryById(int id){
+        if (mapIdSubtaskByEpic.containsKey(id)){
+            ArrayList<Integer> idSubtask = mapIdSubtaskByEpic.get(id);
+            for (Integer integer : idSubtask) {
+                historyManager.remove(integer);
+            }
+        }
+        historyManager.remove(id);
     }
 }
