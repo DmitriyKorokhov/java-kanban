@@ -14,14 +14,13 @@ public class InMemoryTaskManager implements TaskManager {
     private final HashMap<Integer, Subtask> subtaskTable = new HashMap<>();
     private final HashMap<Integer, Epic> epicTable = new HashMap<>();
     private final HashMap<Integer, Task> taskTable = new HashMap<>();
-
     private final HistoryManager historyManager = Managers.getDefaultHistory();
-
-    private HashMap<Integer, ArrayList<Integer>> mapIdSubtaskByEpic = new HashMap<>();
-    private HashMap<Integer, Status> mapStatusSubtask = new HashMap<>();
+    // прописал модификаторы final (не учел из-зи невнимательности)
+    private final HashMap<Integer, ArrayList<Integer>> mapIdSubtaskByEpic = new HashMap<>();
+    private final HashMap<Integer, Status> mapStatusSubtask = new HashMap<>();
 
     @Override
-    public int saveTask(Task task){
+    public int saveTask(Task task) {
         task.setTaskId(taskId);
         taskTable.put(task.getTaskId(), task);
         this.taskId++;
@@ -29,47 +28,49 @@ public class InMemoryTaskManager implements TaskManager {
     }
 
     @Override
-    public void updateTask(Task task){
+    public void updateTask(Task task) {
         int id = taskId - 1;
         taskTable.put(id, task);
         task.setTaskId(id);
-        if (task.getTaskStatus().equals(Status.NEW)){
+        if (task.getTaskStatus().equals(Status.NEW)) {
             task.setTaskStatus(Status.IN_PROGRESS);
-        } else if (task.getTaskStatus().equals(Status.IN_PROGRESS)){
+        } else if (task.getTaskStatus().equals(Status.IN_PROGRESS)) {
             task.setTaskStatus(Status.DONE);
         }
     }
 
     @Override
-    public void outputAllTasks(){
+    public void outputAllTasks() {
         for (Task value : taskTable.values()) {
             System.out.println(value);
         }
     }
 
     @Override
-    public void clearAllTasks(){
+    public void clearAllTasks() {
         taskTable.clear();
 
     }
 
     @Override
-    public Task outputByIdTask(Integer id){
-        historyManager.add(taskTable.getOrDefault(id, new Task("Задача отсутствует",
-                "Задача с данным id удалена или не вводилась")));
-        return taskTable.getOrDefault(id, new Task("Задача отсутствует",
-                "Задача с данным id удалена или не вводилась"));
+    public Task outputByIdTask(Integer id) {
+        if (!taskTable.containsKey(id)) {
+            return new Task("Задача отсутствует", "Задача с данным id удалена или не вводилась");
+        } else {
+            historyManager.add(taskTable.get(id));
+            return taskTable.get(id);
+        }
     }
 
     @Override
-    public Task clearByIdTask(Integer id){
+    public Task clearByIdTask(Integer id) {
         Task task = taskTable.remove(id);
         System.out.println("Задача с id = " + id + " удалена");
         return task;
     }
 
     @Override
-    public int saveEpic(Epic epic){
+    public int saveEpic(Epic epic) {
         epic.setTaskId(taskId);
         epicTable.put(epic.getTaskId(), epic);
         this.taskId++;
@@ -77,7 +78,7 @@ public class InMemoryTaskManager implements TaskManager {
     }
 
     @Override
-    public void updateEpic(Epic epic){
+    public void updateEpic(Epic epic) {
         int id = taskId - 1;
         epicTable.put(id, epic);
         epic.setTaskId(id);
@@ -91,21 +92,23 @@ public class InMemoryTaskManager implements TaskManager {
     }
 
     @Override
-    public void clearAllEpics(){
+    public void clearAllEpics() {
         epicTable.clear();
         clearAllSubtasks();
     }
 
     @Override
-    public Epic outputByIdEpic(Integer id){
-        historyManager.add(epicTable.getOrDefault(id, new Epic("Епик отсутствует",
-                "Епик с данным id удален или не вводился")));
-        return epicTable.getOrDefault(id, new Epic("Епик отсутствует",
-                "Епик с данным id удален или не вводился"));
+    public Epic outputByIdEpic(Integer id) {
+        if (!epicTable.containsKey(id)) {
+            return new Epic("Епик отсутствует", "Епик с данным id удален или не вводился");
+        } else {
+            historyManager.add(epicTable.get(id));
+            return epicTable.get(id);
+        }
     }
 
     @Override
-    public Epic clearByIdEpic(Integer id){
+    public Epic clearByIdEpic(Integer id) {
         Epic epic = epicTable.remove(id);
         System.out.println("Эпик с id = " + id + " удален");
         ArrayList<Integer> idSubtask = mapIdSubtaskByEpic.get(id);
@@ -116,9 +119,9 @@ public class InMemoryTaskManager implements TaskManager {
     }
 
     @Override
-    public int saveSubtask(Subtask subtask, Epic epic, ArrayList<Integer> epicListId){
+    public int saveSubtask(Subtask subtask, Epic epic, ArrayList<Integer> epicListId) {
         mapIdSubtaskByEpic.put(epic.getTaskId(), epicListId);
-        mapStatusSubtask.put(taskId, subtask.subtaskStatus);
+        mapStatusSubtask.put(taskId, subtask.getSubtaskStatus());
         subtask.setTaskId(taskId);
         epicListId.add(taskId);
         epic.setEpicListId(epicListId);
@@ -128,14 +131,14 @@ public class InMemoryTaskManager implements TaskManager {
     }
 
     @Override
-    public void updateSubtask(Subtask subtask){
+    public void updateSubtask(Subtask subtask) {
         int id = taskId - 1;
         subtaskTable.put(id, subtask);
         subtask.setTaskId(id);
-        if (subtask.getSubtaskStatus().equals(Status.NEW)){
+        if (subtask.getSubtaskStatus().equals(Status.NEW)) {
             subtask.setSubtaskStatus(Status.IN_PROGRESS);
             mapStatusSubtask.put(id, Status.IN_PROGRESS);
-        } else if (subtask.getSubtaskStatus().equals(Status.IN_PROGRESS)){
+        } else if (subtask.getSubtaskStatus().equals(Status.IN_PROGRESS)) {
             subtask.setSubtaskStatus(Status.DONE);
             mapStatusSubtask.put(id, Status.DONE);
         }
@@ -149,27 +152,29 @@ public class InMemoryTaskManager implements TaskManager {
     }
 
     @Override
-    public void clearAllSubtasks(){
+    public void clearAllSubtasks() {
         subtaskTable.clear();
     }
 
     @Override
-    public Subtask outputByIdSubtasks(Integer id){
-        historyManager.add(subtaskTable.getOrDefault(id, new Subtask("Подзадача отсутствует",
-                "Подзадача с данным id удалена или не вводилась")));
-        return subtaskTable.getOrDefault(id, new Subtask("Подзадача отсутствует",
-                "Подзадача с данным id удалена или не вводилась"));
+    public Subtask outputByIdSubtasks(Integer id) {
+        if (!subtaskTable.containsKey(id)) {
+            return new Subtask("Подзадача отсутствует", "Подзадача с данным id удалена или не вводилась");
+        } else {
+            historyManager.add(subtaskTable.get(id));
+            return subtaskTable.get(id);
+        }
     }
 
     @Override
-    public Subtask clearByIdSubtasks(Integer id){
+    public Subtask clearByIdSubtasks(Integer id) {
         Subtask subtask = subtaskTable.remove(id);
         System.out.println("Подадача с id = " + id + " удалена");
         return subtask;
     }
 
     @Override
-    public void SubtaskByEpic(ArrayList<Integer> epicListId){
+    public void SubtaskByEpic(ArrayList<Integer> epicListId) {
         for (Integer integer : epicListId) {
             for (Integer key : subtaskTable.keySet()) {
                 if(integer.equals(key)){

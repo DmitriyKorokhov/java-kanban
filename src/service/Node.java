@@ -1,7 +1,7 @@
 package service;
 
 import model.Task;
-
+// для класса с помощью дженериков определяю тип (далее с ним работаю, используя универсальные алгоритмы)
 public class Node<E> {
     Task item;
     Node<Task> next;

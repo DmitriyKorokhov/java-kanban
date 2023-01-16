@@ -1,7 +1,8 @@
 package model;
 
 public class Subtask extends Task{
-    public Status subtaskStatus;
+    // исправил модификатор доступа
+    private Status subtaskStatus;
 
     public Subtask(String mainTask, String mainSpecification) {
         super(mainTask, mainSpecification);

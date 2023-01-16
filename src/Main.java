@@ -104,8 +104,5 @@ public class Main {
         manager.removeHistoryById(2);
         System.out.println("Вывод истории (на 4 элемента меньше: Эпика с id = 2 и Подзадач с d = 4, 5, 6)");
         System.out.println(manager.getHistory());
-
-
-
     }
 }

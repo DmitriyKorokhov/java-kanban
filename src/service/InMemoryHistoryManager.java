@@ -4,42 +4,47 @@ import model.Task;
 
 import java.util.*;
 
-public class InMemoryHistoryManager implements HistoryManager{
-    private HashMap<Integer, Node<Task>> nodeMap = new HashMap<>();
-    CustomLinkedList<Task> customLinkedList = new CustomLinkedList<>();
+public class InMemoryHistoryManager implements HistoryManager {
+    /* обавил модификатор final, конечная переменная является ссылкой (ее нельзя будет
+       повторно привязать к другому объекту), но на содержание объекта, на которое
+       указывает эта ссылочная переменная, может быть изменено (удаление или добавление элементов)
+    */
+    private final HashMap<Integer, Node<Task>> nodeMap = new HashMap<>();
+    private final CustomLinkedList<Task> customLinkedList = new CustomLinkedList<>();
+
     private class CustomLinkedList<T> {
         transient Node<Task> first;
         transient Node<Task> last;
 
+        // исправил имена параметров
         void linkLast(Task task) {
-            final Node<Task> l = last;
-            final Node<Task> newNode = new Node<>(l, task, null);
+            final Node<Task> lastNode = last;
+            final Node<Task> newNode = new Node<>(lastNode, task, null);
             last = newNode;
-            if (l == null)
+            if (lastNode == null)
                 first = newNode;
             else
-                l.next = newNode;
+                lastNode.next = newNode;
                 nodeMap.put(task.getTaskId(), newNode);
         }
-
-        public Task removeNode(Node<Task> x) {
-            final Task element = x.item;
-            final Node<Task> next = x.next;
-            final Node<Task> prev = x.prev;
+        // метод removeNode() не должен ничего возвращать
+        // в методах outputById... я учитываю, что Задача/ Эпик/ Подзадача может быть удален(а) или вообще не вводилась
+        public void removeNode(Node<Task> node) {
+            final Node<Task> next = node.next;
+            final Node<Task> prev = node.prev;
             if (prev == null) {
                 first = next;
             } else {
                 prev.next = next;
-                x.prev = null;
+                node.prev = null;
             }
             if (next == null) {
                 last = prev;
             } else {
                 next.prev = prev;
-                x.next = null;
+                node.next = null;
             }
-            x.item = null;
-            return element;
+            node.item = null;
         }
 
         public List<Task> getTasks() {
@@ -64,12 +69,12 @@ public class InMemoryHistoryManager implements HistoryManager{
     }
 
     @Override
-    public List<Task> getHistory(){
+    public List<Task> getHistory() {
         return customLinkedList.getTasks();
     }
 
     @Override
-    public void add(Task task){
+    public void add(Task task) {
         if (nodeMap.containsKey(task.getTaskId())) {
             customLinkedList.removeNode(nodeMap.get((task.getTaskId())));
             customLinkedList.linkLast(task);
