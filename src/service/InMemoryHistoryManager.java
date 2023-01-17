@@ -9,17 +9,16 @@ public class InMemoryHistoryManager implements HistoryManager {
        повторно привязать к другому объекту), но на содержание объекта, на которое
        указывает эта ссылочная переменная, может быть изменено (удаление или добавление элементов)
     */
-    private final HashMap<Integer, Node<Task>> nodeMap = new HashMap<>();
-    private final CustomLinkedList<Task> customLinkedList = new CustomLinkedList<>();
+    private final HashMap<Integer, Node> nodeMap = new HashMap<>();
+    private final CustomLinkedList customLinkedList = new CustomLinkedList();
 
-    private class CustomLinkedList<T> {
-        transient Node<Task> first;
-        transient Node<Task> last;
+    private class CustomLinkedList {
+        transient Node first;
+        transient Node last;
 
-        // исправил имена параметров
         void linkLast(Task task) {
-            final Node<Task> lastNode = last;
-            final Node<Task> newNode = new Node<>(lastNode, task, null);
+            final Node lastNode = last;
+            final Node newNode = new Node(lastNode, task, null);
             last = newNode;
             if (lastNode == null)
                 first = newNode;
@@ -27,11 +26,10 @@ public class InMemoryHistoryManager implements HistoryManager {
                 lastNode.next = newNode;
                 nodeMap.put(task.getTaskId(), newNode);
         }
-        // метод removeNode() не должен ничего возвращать
-        // в методах outputById... я учитываю, что Задача/ Эпик/ Подзадача может быть удален(а) или вообще не вводилась
-        public void removeNode(Node<Task> node) {
-            final Node<Task> next = node.next;
-            final Node<Task> prev = node.prev;
+
+        public void removeNode(Node node) {
+            final Node next = node.next;
+            final Node prev = node.prev;
             if (prev == null) {
                 first = next;
             } else {
@@ -49,7 +47,7 @@ public class InMemoryHistoryManager implements HistoryManager {
 
         public List<Task> getTasks() {
             List<Task> historyManager = new ArrayList<>();
-            Node<Task> currentNode = first;
+            Node currentNode = first;
             if (currentNode == null) {
                 System.out.println("Список пустой");
             } else {

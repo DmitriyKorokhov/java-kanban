@@ -1,13 +1,13 @@
 package service;
 
 import model.Task;
-// для класса с помощью дженериков определяю тип (далее с ним работаю, используя универсальные алгоритмы)
-public class Node<E> {
-    Task item;
-    Node<Task> next;
-    Node<Task> prev;
 
-    Node(Node<Task> prev, Task element, Node<Task> next) {
+public class Node {
+    Task item;
+    Node next;
+    Node prev;
+    // из Вашего комментария понял, что нет смысла использовть дженерики
+    Node(Node prev, Task element, Node next) {
         this.item = element;
         this.next = next;
         this.prev = prev;
