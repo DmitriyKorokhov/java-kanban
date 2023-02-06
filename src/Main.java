@@ -7,7 +7,7 @@ public class Main {
 
     public static void main(String[] args) {
         String taskTitleOne = "Переезд";
-        String taskSpecificationOne = "Я перезжаю в новую квартиру, мне нужно спланировать, как я буду перевозить вещи";
+        String taskSpecificationOne = "Я перезжаю в новую квартиру";
         Task taskOne = new Task(taskTitleOne, taskSpecificationOne);
 
         String taskTitleTwo = "Переезд";
@@ -20,18 +20,18 @@ public class Main {
 
         String subtaskTitleOne1 = "Распределение вещей";
         String subtaskSpecificationOne1 = "Вещи будут распределены по соответсвующим коробкам в определенном порядке";
-        Subtask subtaskOne1 = new Subtask(subtaskTitleOne1, subtaskSpecificationOne1);
+        Subtask subtaskOne1 = new Subtask(subtaskTitleOne1, subtaskSpecificationOne1, epicOne.getTaskId());
 
         String subtaskTitleOne2 = "Упаковка";
         String subtaskSpecificationOne2 = "Распределенные вещи нужно аккуратно упаковать";
-        Subtask subtaskOne2 = new Subtask(subtaskTitleOne2, subtaskSpecificationOne2);
+        Subtask subtaskOne2 = new Subtask(subtaskTitleOne2, subtaskSpecificationOne2, epicOne.getTaskId());
 
         String subtaskTitleOne3 = "Упаковка";
         String subtaskSpecificationOne3 = "Распределенные вещи нужно аккуратно упаковать";
-        Subtask subtaskOne3 = new Subtask(subtaskTitleOne3, subtaskSpecificationOne3);
+        Subtask subtaskOne3 = new Subtask(subtaskTitleOne3, subtaskSpecificationOne3, epicOne.getTaskId());
 
         String epicTitleTwo = "Погрузка, проверка и маркировка коробок в машину";
-        String epicSpecificationTwo = "После сбора вещей в коробки, нужно вгрузить все в машину";
+        String epicSpecificationTwo = "Нужно вгрузить все в машину";
         Epic epicTwo = new Epic(epicTitleTwo, epicSpecificationTwo);
 
         TaskManager manager = Managers.getDefault();
@@ -43,9 +43,9 @@ public class Main {
         System.out.println("Вывод всех задач");
         manager.outputAllTasks();
         System.out.println("Вывожу задачу с id = 0");
-        System.out.println(manager.outputByIdTask(0));
+        manager.outputByIdTask(0);
         System.out.println("Вывожу задачу с id = 1");
-        System.out.println(manager.outputByIdTask(1));
+        manager.outputByIdTask(1);
         System.out.println("Вывод истории");
         System.out.println(manager.getHistory());
         System.out.println("Добавление эпика 1");
@@ -64,36 +64,36 @@ public class Main {
         manager.outputAllSubtasks();
         System.out.println("ранее выводилась задача с id = 0, повтор удалится (1 элемент в Списке) и перезапишется в конец");
         System.out.println("Вывожу задачу с id = 0");
-        System.out.println(manager.outputByIdTask(0));
+        manager.outputByIdTask(0);
         System.out.println("Вывод истории");
         System.out.println(manager.getHistory());
         System.out.println("Вывожу подзадачу с id = 6");
-        System.out.println(manager.outputByIdSubtasks(6));
+        manager.outputByIdSubtasks(6);
         System.out.println("Вывожу подзадачу с id = 5");
-        System.out.println(manager.outputByIdSubtasks(5));
+        manager.outputByIdSubtasks(5);
         System.out.println("Вывожу подзадачу с id = 4");
-        System.out.println(manager.outputByIdSubtasks(4));
+        manager.outputByIdSubtasks(4);
         System.out.println("Вывод истории");
         System.out.println(manager.getHistory());
         System.out.println("ранее выводился эпик с id = 6, повтор удалится и перезапишется в конец");
         System.out.println("Вывожу подзадачу с id = 6");
-        System.out.println(manager.outputByIdSubtasks(6));
+        manager.outputByIdSubtasks(6);
         System.out.println("Вывод истории");
         System.out.println(manager.getHistory());
         System.out.println("Вывожу эпик с id = 3");
-        System.out.println(manager.outputByIdEpic(3));
+        manager.outputByIdEpic(3);
         System.out.println("Вывожу эпик с id = 2");
-        System.out.println(manager.outputByIdEpic(2));
+        manager.outputByIdEpic(2);
         System.out.println("Вывод истории");
         System.out.println(manager.getHistory());
         System.out.println("ранее выводилась родзадача с id = 3, повтор удалится и перезапишется в конец");
         System.out.println("Вывожу эпик с id = 3");
-        System.out.println(manager.outputByIdEpic(3));
+        manager.outputByIdEpic(3);
         System.out.println("Вывод истории");
         System.out.println(manager.getHistory());
         System.out.println("ранее выводилась задача с id = 1, повтор удалится (1 элемент в Списке) и перезапишется в конец");
         System.out.println("Вывожу задачу с id = 1");
-        System.out.println(manager.outputByIdTask(1));
+        manager.outputByIdTask(1);
         System.out.println("Вывод истории");
         System.out.println(manager.getHistory());
         System.out.println("Удаляю из истории элемент с id = 0");

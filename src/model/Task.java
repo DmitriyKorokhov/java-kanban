@@ -5,11 +5,21 @@ public class Task {
     private String taskSpecification;
     private int taskId;
     private Status taskStatus;
+    private TypesOfTasks taskType;
 
     public Task(String taskTitle, String taskSpecification) {
         this.taskTitle = taskTitle;
         this.taskSpecification = taskSpecification;
         taskStatus = Status.NEW;
+        taskType = TypesOfTasks.TASK;
+    }
+
+    public void setTaskType(TypesOfTasks taskType) {
+        this.taskType = taskType;
+    }
+
+    public TypesOfTasks getTaskType() {
+        return taskType;
     }
 
     public String getTaskTitle() {
@@ -46,12 +56,12 @@ public class Task {
 
     @Override
     public String toString() {
-        return "Task{" +
-                "taskTitle='" + taskTitle + '\'' +
-                ", taskSpecification='" + taskSpecification + '\'' +
-                ", taskStatus='" + taskStatus + '\'' +
-                ", taskId=" + taskId +
-                '}';
+        return  taskId +
+                "," + taskType +
+                "," + taskTitle +
+                "," + taskStatus +
+                "," + taskSpecification
+                ;
     }
 }
 

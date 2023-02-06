@@ -11,20 +11,19 @@ import java.util.List;
 
 public class InMemoryTaskManager implements TaskManager {
     private int taskId = 0;
+    private final HistoryManager historyManager = Managers.getDefaultHistory();
     private final HashMap<Integer, Subtask> subtaskTable = new HashMap<>();
     private final HashMap<Integer, Epic> epicTable = new HashMap<>();
     private final HashMap<Integer, Task> taskTable = new HashMap<>();
-    private final HistoryManager historyManager = Managers.getDefaultHistory();
-    // прописал модификаторы final (не учел из-зи невнимательности)
     private final HashMap<Integer, ArrayList<Integer>> mapIdSubtaskByEpic = new HashMap<>();
     private final HashMap<Integer, Status> mapStatusSubtask = new HashMap<>();
+    private final ArrayList<Integer> listOfTasksIdForHistory = new ArrayList<>();
 
     @Override
-    public int saveTask(Task task) {
+    public void saveTask(Task task) {
         task.setTaskId(taskId);
         taskTable.put(task.getTaskId(), task);
         this.taskId++;
-        return taskId;
     }
 
     @Override
@@ -49,32 +48,30 @@ public class InMemoryTaskManager implements TaskManager {
     @Override
     public void clearAllTasks() {
         taskTable.clear();
-
     }
 
     @Override
-    public Task outputByIdTask(Integer id) {
+    public void outputByIdTask(Integer id) {
         if (!taskTable.containsKey(id)) {
-            return new Task("Задача отсутствует", "Задача с данным id удалена или не вводилась");
+            System.out.println("Задача с данным id удалена или не вводилась");
         } else {
             historyManager.add(taskTable.get(id));
-            return taskTable.get(id);
+            listOfTasksIdForHistory.add(id);
+            System.out.println(taskTable.get(id));
         }
     }
 
     @Override
-    public Task clearByIdTask(Integer id) {
-        Task task = taskTable.remove(id);
+    public void clearByIdTask(Integer id) {
+        taskTable.remove(id);
         System.out.println("Задача с id = " + id + " удалена");
-        return task;
     }
 
     @Override
-    public int saveEpic(Epic epic) {
+    public void saveEpic(Epic epic) {
         epic.setTaskId(taskId);
         epicTable.put(epic.getTaskId(), epic);
         this.taskId++;
-        return taskId;
     }
 
     @Override
@@ -98,36 +95,36 @@ public class InMemoryTaskManager implements TaskManager {
     }
 
     @Override
-    public Epic outputByIdEpic(Integer id) {
+    public void outputByIdEpic(Integer id) {
         if (!epicTable.containsKey(id)) {
-            return new Epic("Епик отсутствует", "Епик с данным id удален или не вводился");
+            System.out.println("Епик с данным id удален или не вводился");
         } else {
             historyManager.add(epicTable.get(id));
-            return epicTable.get(id);
+            listOfTasksIdForHistory.add(id);
+            System.out.println(epicTable.get(id));
         }
     }
 
     @Override
-    public Epic clearByIdEpic(Integer id) {
-        Epic epic = epicTable.remove(id);
+    public void clearByIdEpic(Integer id) {
+        epicTable.remove(id);
         System.out.println("Эпик с id = " + id + " удален");
-        ArrayList<Integer> idSubtask = mapIdSubtaskByEpic.get(id);
-        for (Integer integer : idSubtask) {
-                   subtaskTable.remove(integer);
+        ArrayList<Integer> listOfIdSubtask = mapIdSubtaskByEpic.get(id);
+        for (Integer idSubtask : listOfIdSubtask) {
+                   subtaskTable.remove(idSubtask);
         }
-        return epic;
     }
 
     @Override
-    public int saveSubtask(Subtask subtask, Epic epic, ArrayList<Integer> epicListId) {
+    public void saveSubtask(Subtask subtask, Epic epic, ArrayList<Integer> epicListId) {
         mapIdSubtaskByEpic.put(epic.getTaskId(), epicListId);
         mapStatusSubtask.put(taskId, subtask.getSubtaskStatus());
         subtask.setTaskId(taskId);
         epicListId.add(taskId);
         epic.setEpicListId(epicListId);
         subtaskTable.put(subtask.getTaskId(), subtask);
+        subtask.setIdEpic(epic.getTaskId());
         this.taskId++;
-        return taskId;
     }
 
     @Override
@@ -157,20 +154,20 @@ public class InMemoryTaskManager implements TaskManager {
     }
 
     @Override
-    public Subtask outputByIdSubtasks(Integer id) {
+    public void outputByIdSubtasks(Integer id) {
         if (!subtaskTable.containsKey(id)) {
-            return new Subtask("Подзадача отсутствует", "Подзадача с данным id удалена или не вводилась");
+            System.out.println("Подзадача с данным id удалена или не вводилась");
         } else {
             historyManager.add(subtaskTable.get(id));
-            return subtaskTable.get(id);
+            listOfTasksIdForHistory.add(id);
+            System.out.println(subtaskTable.get(id));
         }
     }
 
     @Override
-    public Subtask clearByIdSubtasks(Integer id) {
-        Subtask subtask = subtaskTable.remove(id);
+    public void clearByIdSubtasks(Integer id) {
+        subtaskTable.remove(id);
         System.out.println("Подадача с id = " + id + " удалена");
-        return subtask;
     }
 
     @Override
@@ -213,11 +210,35 @@ public class InMemoryTaskManager implements TaskManager {
     @Override
     public void removeHistoryById(int id){
         if (mapIdSubtaskByEpic.containsKey(id)){
-            ArrayList<Integer> idSubtask = mapIdSubtaskByEpic.get(id);
-            for (Integer integer : idSubtask) {
-                historyManager.remove(integer);
+            ArrayList<Integer> listOfIdSubtask = mapIdSubtaskByEpic.get(id);
+            for (Integer idSubtask : listOfIdSubtask) {
+                historyManager.remove(idSubtask);
             }
         }
         historyManager.remove(id);
+    }
+
+    public HashMap<Integer, Subtask> getSubtaskTable() {
+        return subtaskTable;
+    }
+
+    public HashMap<Integer, Epic> getEpicTable() {
+        return epicTable;
+    }
+
+    public HashMap<Integer, Task> getTaskTable() {
+        return taskTable;
+    }
+
+    public HashMap<Integer, ArrayList<Integer>> getMapIdSubtaskByEpic() {
+        return mapIdSubtaskByEpic;
+    }
+
+    public ArrayList<Integer> getListOfTasksIdForHistory() {
+        return listOfTasksIdForHistory;
+    }
+
+    public HistoryManager getHistoryManager() {
+        return historyManager;
     }
 }

@@ -1,12 +1,31 @@
 package model;
 
 public class Subtask extends Task{
-    // исправил модификатор доступа
     private Status subtaskStatus;
+    private TypesOfTasks subtaskType;
 
-    public Subtask(String mainTask, String mainSpecification) {
+    private int idEpic;
+
+    public Subtask(String mainTask, String mainSpecification, int idEpic) {
         super(mainTask, mainSpecification);
         subtaskStatus = Status.NEW;
+        subtaskType = TypesOfTasks.SUBTASK;
+        this.idEpic = idEpic;
+    }
+
+    public int getIdEpic() {
+        return idEpic;
+    }
+
+    public void setIdEpic(int idEpic) {
+        this.idEpic = idEpic;
+    }
+    public void setSubtaskType(TypesOfTasks subtaskType) {
+        this.subtaskType = subtaskType;
+    }
+
+    public TypesOfTasks getSubtaskType() {
+        return subtaskType;
     }
 
     public Status getSubtaskStatus() {
@@ -15,6 +34,11 @@ public class Subtask extends Task{
 
     public void setSubtaskStatus(Status subtaskStatus) {
         this.subtaskStatus = subtaskStatus;
+    }
+
+    @Override
+    public TypesOfTasks getTaskType() {
+        return subtaskType;
     }
 
     @Override
@@ -39,11 +63,12 @@ public class Subtask extends Task{
 
     @Override
     public String toString() {
-        return "SubTask{" +
-                "SubTaskTitle='" + getTaskTitle() + '\'' +
-                ", SubTaskSpecification='" + getTaskSpecification()+ '\'' +
-                ", SubTaskStatus='" + getSubtaskStatus() + '\'' +
-                ", SubTaskId=" + getTaskId() +
-                '}';
+        return  getTaskId() +
+                "," + subtaskType +
+                "," + getTaskTitle() +
+                "," + subtaskStatus +
+                "," + getTaskSpecification() +
+                "," + getIdEpic()
+                ;
     }
 }

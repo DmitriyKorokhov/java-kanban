@@ -6,11 +6,21 @@ public class Epic extends Task{
     private ArrayList<Integer> epicListId;
 
     private Status epicStatus;
+    private TypesOfTasks epicType;
 
     public Epic(String taskTitle, String taskSpecification) {
         super(taskTitle, taskSpecification);
         epicListId = new ArrayList<>();
         epicStatus = Status.NEW;
+        epicType = TypesOfTasks.EPIC;
+    }
+
+    public void setEpicType(TypesOfTasks epicType) {
+        this.epicType = epicType;
+    }
+
+    public TypesOfTasks getEpicType() {
+        return epicType;
     }
 
     public ArrayList<Integer> getEpicListId() {
@@ -20,7 +30,6 @@ public class Epic extends Task{
     public void setEpicListId(ArrayList<Integer> epicListId) {
         this.epicListId = epicListId;
     }
-
 
     public Status getEpicStatus() {
         return epicStatus;
@@ -52,11 +61,11 @@ public class Epic extends Task{
 
     @Override
     public String toString() {
-        return "Epic{" +
-                "epicTitle='" + getTaskTitle() + '\'' +
-                ", epicSpecification='" + getTaskSpecification() + '\'' +
-                ", epicStatus='" + epicStatus + '\'' +
-                ", epicId=" + getTaskId() +
-                '}';
+        return  getTaskId() +
+                "," + epicType +
+                "," + getTaskTitle() +
+                "," + epicStatus +
+                "," + getTaskSpecification()
+                ;
     }
 }

@@ -5,10 +5,6 @@ import model.Task;
 import java.util.*;
 
 public class InMemoryHistoryManager implements HistoryManager {
-    /* обавил модификатор final, конечная переменная является ссылкой (ее нельзя будет
-       повторно привязать к другому объекту), но на содержание объекта, на которое
-       указывает эта ссылочная переменная, может быть изменено (удаление или добавление элементов)
-    */
     private final HashMap<Integer, Node> nodeMap = new HashMap<>();
     private final CustomLinkedList customLinkedList = new CustomLinkedList();
 

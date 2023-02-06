@@ -5,10 +5,11 @@ import model.Subtask;
 import model.Task;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 
 public interface TaskManager {
-    int saveTask(Task task);
+    void saveTask(Task task);
 
     void updateTask(Task task);
 
@@ -16,11 +17,11 @@ public interface TaskManager {
 
     void clearAllTasks();
 
-    Task outputByIdTask(Integer id);
+    void outputByIdTask(Integer id);
 
-    Task clearByIdTask(Integer id);
+    void clearByIdTask(Integer id);
 
-    int saveEpic(Epic epic);
+    void saveEpic(Epic epic);
 
     void updateEpic(Epic epic);
 
@@ -28,11 +29,11 @@ public interface TaskManager {
 
     void clearAllEpics();
 
-    Epic outputByIdEpic(Integer id);
+    void outputByIdEpic(Integer id);
 
-    Epic clearByIdEpic(Integer id);
+    void clearByIdEpic(Integer id);
 
-    int saveSubtask(Subtask subtask, Epic epic, ArrayList<Integer> epicListId);
+    void saveSubtask(Subtask subtask, Epic epic, ArrayList<Integer> epicListId);
 
     void updateSubtask(Subtask subtask);
 
@@ -40,9 +41,9 @@ public interface TaskManager {
 
     void clearAllSubtasks();
 
-    Subtask outputByIdSubtasks(Integer id);
+    void outputByIdSubtasks(Integer id);
 
-    Subtask clearByIdSubtasks(Integer id);
+    void clearByIdSubtasks(Integer id);
 
     void SubtaskByEpic(ArrayList<Integer> epicListId);
 
@@ -51,4 +52,16 @@ public interface TaskManager {
     List<Task> getHistory();
 
     void removeHistoryById(int id);
+
+    HashMap<Integer, Subtask> getSubtaskTable();
+
+    HashMap<Integer, Epic> getEpicTable();
+
+    HashMap<Integer, Task> getTaskTable();
+
+    HashMap<Integer, ArrayList<Integer>> getMapIdSubtaskByEpic();
+
+    ArrayList<Integer> getListOfTasksIdForHistory();
+
+    HistoryManager getHistoryManager();
 }
