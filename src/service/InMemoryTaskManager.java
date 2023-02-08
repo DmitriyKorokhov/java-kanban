@@ -56,7 +56,12 @@ public class InMemoryTaskManager implements TaskManager {
             System.out.println("Задача с данным id удалена или не вводилась");
         } else {
             historyManager.add(taskTable.get(id));
-            listOfTasksIdForHistory.add(id);
+            if (listOfTasksIdForHistory.contains(id)){
+                listOfTasksIdForHistory.remove(id);
+                listOfTasksIdForHistory.add(id);
+            } else {
+                listOfTasksIdForHistory.add(id);
+            }
             System.out.println(taskTable.get(id));
         }
     }
@@ -100,7 +105,12 @@ public class InMemoryTaskManager implements TaskManager {
             System.out.println("Епик с данным id удален или не вводился");
         } else {
             historyManager.add(epicTable.get(id));
-            listOfTasksIdForHistory.add(id);
+            if (listOfTasksIdForHistory.contains(id)){
+                listOfTasksIdForHistory.remove(id);
+                listOfTasksIdForHistory.add(id);
+            } else {
+                listOfTasksIdForHistory.add(id);
+            }
             System.out.println(epicTable.get(id));
         }
     }
@@ -159,7 +169,12 @@ public class InMemoryTaskManager implements TaskManager {
             System.out.println("Подзадача с данным id удалена или не вводилась");
         } else {
             historyManager.add(subtaskTable.get(id));
-            listOfTasksIdForHistory.add(id);
+            if (listOfTasksIdForHistory.contains(id)){
+                listOfTasksIdForHistory.remove(id);
+                listOfTasksIdForHistory.add(id);
+            } else {
+                listOfTasksIdForHistory.add(id);
+            }
             System.out.println(subtaskTable.get(id));
         }
     }

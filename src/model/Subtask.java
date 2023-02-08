@@ -20,6 +20,7 @@ public class Subtask extends Task{
     public void setIdEpic(int idEpic) {
         this.idEpic = idEpic;
     }
+
     public void setSubtaskType(TypesOfTasks subtaskType) {
         this.subtaskType = subtaskType;
     }

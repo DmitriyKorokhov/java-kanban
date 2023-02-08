@@ -16,21 +16,22 @@ import java.util.HashMap;
 import java.util.List;
 
 public class FileBackedTasksManager extends InMemoryTaskManager implements TaskManager{
-    private String file;
+    //Да, это константа, т.к. ее значение нельзя изменять
+    private final String file;
 
     public FileBackedTasksManager(String file) {
         this.file = file;
     }
 
     public static void main(String[] args){
-        FileBackedTasksManager fileBackedTasksManager = new FileBackedTasksManager("file.csv");
+        FileBackedTasksManager fileBackedTasksManager = Managers.getDefaultFileBackedTasksManager();
 
         String taskTitleOne = "Переезд";
-        String taskSpecificationOne = "Я перезжаю в новую квартиру, мне нужно спланировать, как я буду перевозить вещи";
+        String taskSpecificationOne = "Я перезжаю в новую квартиру";
         Task taskOne = new Task(taskTitleOne, taskSpecificationOne);
 
         String taskTitleTwo = "Переезд";
-        String taskSpecificationTwo = "Продумал инструкции и начинаю подготовку";
+        String taskSpecificationTwo = "Продумал инструкции и начинаю подготовку к переезду";
         Task taskTwo = new Task(taskTitleTwo, taskSpecificationTwo);
 
         String epicTitleOne = "Сбор коробок";
@@ -79,14 +80,17 @@ public class FileBackedTasksManager extends InMemoryTaskManager implements TaskM
         fileBackedTasksManager.outputAllTasks();
         System.out.println("Вывожу подзадачу с id = 6");
         fileBackedTasksManager.outputByIdSubtasks(6);
+        System.out.println("Вывожу подзадачу с id = 6");
+        fileBackedTasksManager.outputByIdSubtasks(6);
         System.out.println("Вывожу подзадачу с id = 5");
         fileBackedTasksManager.outputByIdSubtasks(5);
         System.out.println("Вывожу подзадачу с id = 4");
         fileBackedTasksManager.outputByIdSubtasks(4);
+        System.out.println("Вывожу подзадачу с id = 6");
+        fileBackedTasksManager.outputByIdSubtasks(6);
         System.out.println("Вывод истории");
         System.out.println(fileBackedTasksManager.getHistory());
 /*
-        System.out.println("Проверка сохранения и восстановления менеджера из файла");
         FileBackedTasksManager newFileBackedTasksManager = loadFromFile("file.csv");
         System.out.println("Вывод всех задач");
         newFileBackedTasksManager.outputAllTasks();
@@ -95,8 +99,9 @@ public class FileBackedTasksManager extends InMemoryTaskManager implements TaskM
         System.out.println("Вывод всех подзадач");
         newFileBackedTasksManager.outputAllSubtasks();
         System.out.println("Вывод истории");
+        // Нет, не специально. Повторяющиеся элементы в истории должны удаляться, а последний идет в конец
         System.out.println(newFileBackedTasksManager.getHistory());
-*/
+ */
     }
 
     public static FileBackedTasksManager loadFromFile(String file){
@@ -106,7 +111,7 @@ public class FileBackedTasksManager extends InMemoryTaskManager implements TaskM
             fileBackedTasksManager.historyFromString(file);
             return fileBackedTasksManager;
         } catch (Exception e) {
-            throw new ManagerSaveException("Ошибка");
+            throw new ManagerSaveException("Ошибка", e);
         }
     }
 
@@ -134,7 +139,7 @@ public class FileBackedTasksManager extends InMemoryTaskManager implements TaskM
             bufferedWriter.flush();
             bufferedWriter.close();
         } catch (IOException e) {
-            throw new ManagerSaveException("Ошибка в сохранении данных");
+            throw new ManagerSaveException("Ошибка в сохранении данных", e);
         }
     }
 
@@ -169,6 +174,7 @@ public class FileBackedTasksManager extends InMemoryTaskManager implements TaskM
         }
     }
 
+
     public String readFileContentsOrNull(String file) {
         try {
             return Files.readString(Path.of(file));
@@ -192,9 +198,9 @@ public class FileBackedTasksManager extends InMemoryTaskManager implements TaskM
         }
         if (check) {
             String[] parts = line.split(",");
-            for (int j = 0; j < parts.length; j++) {
-                int idHistory = Integer.parseInt(parts[j]);
-                if (getTaskTable().containsKey(Integer.parseInt(parts[j]))) {
+            for (String part : parts) {
+                int idHistory = Integer.parseInt(part);
+                if (getTaskTable().containsKey(idHistory)) {
                     getHistoryManager().add(getTaskTable().get(idHistory));
                     getListOfTasksIdForHistory().add(idHistory);
                 } else if (getEpicTable().containsKey(idHistory)) {
