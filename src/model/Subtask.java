@@ -1,9 +1,11 @@
 package model;
 
+import java.time.Duration;
+import java.time.LocalDateTime;
+
 public class Subtask extends Task{
     private Status subtaskStatus;
     private TypesOfTasks subtaskType;
-
     private int idEpic;
 
     public Subtask(String mainTask, String mainSpecification, int idEpic) {
@@ -11,6 +13,44 @@ public class Subtask extends Task{
         subtaskStatus = Status.NEW;
         subtaskType = TypesOfTasks.SUBTASK;
         this.idEpic = idEpic;
+    }
+
+    public Subtask(String taskTitle, String taskSpecification, int idEpic, LocalDateTime taskStartTime, Duration taskDuration) {
+        super(taskTitle, taskSpecification, taskStartTime, taskDuration);
+        subtaskStatus = Status.NEW;
+        subtaskType = TypesOfTasks.SUBTASK;
+        this.idEpic = idEpic;
+        setTaskEndTime(taskStartTime.plus(taskDuration));
+    }
+
+    @Override
+    public LocalDateTime getTaskStartTime() {
+        return super.getTaskStartTime();
+    }
+
+    @Override
+    public Duration getTaskDuration() {
+        return super.getTaskDuration();
+    }
+
+    @Override
+    public void setTaskDuration(Duration taskDuration) {
+        super.setTaskDuration(taskDuration);
+    }
+
+    @Override
+    public void setTaskStartTime(LocalDateTime taskStartTime) {
+        super.setTaskStartTime(taskStartTime);
+    }
+
+    @Override
+    public LocalDateTime getTaskEndTime() {
+        return super.getTaskEndTime();
+    }
+
+    @Override
+    public void setTaskEndTime(LocalDateTime taskEndTime) {
+        super.setTaskEndTime(taskEndTime);
     }
 
     public int getIdEpic() {
@@ -64,12 +104,26 @@ public class Subtask extends Task{
 
     @Override
     public String toString() {
-        return  getTaskId() +
-                "," + subtaskType +
-                "," + getTaskTitle() +
-                "," + subtaskStatus +
-                "," + getTaskSpecification() +
-                "," + getIdEpic()
-                ;
+        if (getTaskStartTime() == null) {
+            return getTaskId() +
+                    "," + subtaskType +
+                    "," + getTaskTitle() +
+                    "," + subtaskStatus +
+                    "," + getTaskSpecification() +
+                    "," + getIdEpic() +
+                    "," + "indefinitely"
+                    ;
+        } else {
+            return getTaskId() +
+                    "," + subtaskType +
+                    "," + getTaskTitle() +
+                    "," + subtaskStatus +
+                    "," + getTaskSpecification() +
+                    "," + getIdEpic() +
+                    "," + getTaskStartTime() +
+                    "," + getTaskDuration() +
+                    "," + getTaskEndTime()
+                    ;
+        }
     }
 }
