@@ -5,11 +5,9 @@ import model.Status;
 import model.Subtask;
 import model.Task;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
+import java.util.*;
 
-public class InMemoryTaskManager implements TaskManager {
+public class InMemoryTaskManager implements TaskManager  {
     private int taskId = 0;
     private final HistoryManager historyManager = Managers.getDefaultHistory();
     private final HashMap<Integer, Subtask> subtaskTable = new HashMap<>();
@@ -19,22 +17,51 @@ public class InMemoryTaskManager implements TaskManager {
     private final HashMap<Integer, Status> mapStatusSubtask = new HashMap<>();
     private final ArrayList<Integer> listOfTasksIdForHistory = new ArrayList<>();
 
+    private final Set<Task> prioritizedTasks = new TreeSet<>(new Comparator<Task>() {
+        @Override
+        public int compare(Task task1, Task task2) {
+            if (task1.getTaskStartTime() != null && task2.getTaskStartTime() != null) {
+                return task1.getTaskStartTime().compareTo(task2.getTaskStartTime());
+            } else if (task1.getTaskStartTime() == null && task2.getTaskStartTime() != null) {
+                return 1;
+            } else {
+                return -1;
+            }
+        }
+    });
+
+    @Override
+    public Set<Task> getPrioritizedTasks() {
+        return prioritizedTasks;
+    }
+
     @Override
     public void saveTask(Task task) {
         task.setTaskId(taskId);
         taskTable.put(task.getTaskId(), task);
+        prioritizedTasks.add(task);
         this.taskId++;
     }
 
     @Override
-    public void updateTask(Task task) {
-        int id = taskId - 1;
-        taskTable.put(id, task);
-        task.setTaskId(id);
-        if (task.getTaskStatus().equals(Status.NEW)) {
-            task.setTaskStatus(Status.IN_PROGRESS);
-        } else if (task.getTaskStatus().equals(Status.IN_PROGRESS)) {
-            task.setTaskStatus(Status.DONE);
+    public void updateTask(Task task) throws InvalidValueException {
+        boolean check = false;
+        for (Map.Entry<Integer, Task> taskEntry : taskTable.entrySet()) {
+            if (taskEntry.getValue().getTaskTitle().equals(task.getTaskTitle())) {
+                int id = taskEntry.getKey();
+                task.setTaskStatus(taskEntry.getValue().getTaskStatus());
+                task.setTaskId(id);
+                check = true;
+                taskTable.put(id, task);
+                if (task.getTaskStatus().equals(Status.NEW)) {
+                    task.setTaskStatus(Status.IN_PROGRESS);
+                } else if (task.getTaskStatus().equals(Status.IN_PROGRESS)) {
+                    task.setTaskStatus(Status.DONE);
+                }
+            }
+        }
+        if (!check) {
+            throw new InvalidValueException("Задача удалена или не вводилась");
         }
     }
 
@@ -47,13 +74,18 @@ public class InMemoryTaskManager implements TaskManager {
 
     @Override
     public void clearAllTasks() {
+        for (Integer id : taskTable.keySet()) {
+            if (listOfTasksIdForHistory.contains(id)) {
+                listOfTasksIdForHistory.remove(id);
+            }
+        }
         taskTable.clear();
     }
 
     @Override
-    public void outputByIdTask(Integer id) {
+    public void outputByIdTask(Integer id) throws InvalidValueException {
         if (!taskTable.containsKey(id)) {
-            System.out.println("Задача с данным id удалена или не вводилась");
+            throw new InvalidValueException("Задача с данным id удалена или не вводилась");
         } else {
             historyManager.add(taskTable.get(id));
             if (listOfTasksIdForHistory.contains(id)){
@@ -67,9 +99,14 @@ public class InMemoryTaskManager implements TaskManager {
     }
 
     @Override
-    public void clearByIdTask(Integer id) {
-        taskTable.remove(id);
-        System.out.println("Задача с id = " + id + " удалена");
+    public void clearByIdTask(Integer id) throws InvalidValueException {
+        if (taskTable.containsKey(id)) {
+            taskTable.remove(id);
+            listOfTasksIdForHistory.remove(id);
+            System.out.println("Задача с id = " + id + " удалена");
+        } else {
+            throw new InvalidValueException("Задача с данным id удалена или не вводилась");
+        }
     }
 
     @Override
@@ -80,10 +117,20 @@ public class InMemoryTaskManager implements TaskManager {
     }
 
     @Override
-    public void updateEpic(Epic epic) {
-        int id = taskId - 1;
-        epicTable.put(id, epic);
-        epic.setTaskId(id);
+    public void updateEpic(Epic epic) throws InvalidValueException {
+        boolean check = false;
+        for (Map.Entry<Integer, Epic> epicEntry : epicTable.entrySet()) {
+            if (epicEntry.getValue().getTaskTitle().equals(epic.getTaskTitle())) {
+                int id = epicEntry.getKey();
+                epic.setEpicStatus(epicEntry.getValue().getEpicStatus());
+                epic.setTaskId(id);
+                check = true;
+                epicTable.put(id, epic);
+            }
+        }
+        if (!check) {
+            throw new InvalidValueException("Задача удалена или не вводилась");
+        }
     }
 
     @Override
@@ -95,14 +142,19 @@ public class InMemoryTaskManager implements TaskManager {
 
     @Override
     public void clearAllEpics() {
+        for (Integer id : epicTable.keySet()) {
+            if (listOfTasksIdForHistory.contains(id)) {
+                listOfTasksIdForHistory.remove(id);
+            }
+        }
         epicTable.clear();
         clearAllSubtasks();
     }
 
     @Override
-    public void outputByIdEpic(Integer id) {
+    public void outputByIdEpic(Integer id) throws InvalidValueException {
         if (!epicTable.containsKey(id)) {
-            System.out.println("Епик с данным id удален или не вводился");
+            throw new InvalidValueException("Эпик с данным id удален или не вводился");
         } else {
             historyManager.add(epicTable.get(id));
             if (listOfTasksIdForHistory.contains(id)){
@@ -116,12 +168,19 @@ public class InMemoryTaskManager implements TaskManager {
     }
 
     @Override
-    public void clearByIdEpic(Integer id) {
-        epicTable.remove(id);
-        System.out.println("Эпик с id = " + id + " удален");
-        ArrayList<Integer> listOfIdSubtask = mapIdSubtaskByEpic.get(id);
-        for (Integer idSubtask : listOfIdSubtask) {
-                   subtaskTable.remove(idSubtask);
+    public void clearByIdEpic(Integer id) throws InvalidValueException {
+        if (epicTable.containsKey(id)) {
+            epicTable.remove(id);
+            listOfTasksIdForHistory.remove(id);
+            System.out.println("Эпик с id = " + id + " удален");
+            if (!mapIdSubtaskByEpic.isEmpty()) {
+                ArrayList<Integer> listOfIdSubtask = mapIdSubtaskByEpic.get(id);
+                for (Integer idSubtask : listOfIdSubtask) {
+                    subtaskTable.remove(idSubtask);
+                }
+            }
+        } else {
+            throw new InvalidValueException("Эпик с данным id удалена или не вводилась");
         }
     }
 
@@ -134,20 +193,33 @@ public class InMemoryTaskManager implements TaskManager {
         epic.setEpicListId(epicListId);
         subtaskTable.put(subtask.getTaskId(), subtask);
         subtask.setIdEpic(epic.getTaskId());
+        epic.setEpicStartTime(subtask);
+        epic.setEpicEndTime(subtask);
+        prioritizedTasks.add(subtask);
         this.taskId++;
     }
 
     @Override
-    public void updateSubtask(Subtask subtask) {
-        int id = taskId - 1;
-        subtaskTable.put(id, subtask);
-        subtask.setTaskId(id);
-        if (subtask.getSubtaskStatus().equals(Status.NEW)) {
-            subtask.setSubtaskStatus(Status.IN_PROGRESS);
-            mapStatusSubtask.put(id, Status.IN_PROGRESS);
-        } else if (subtask.getSubtaskStatus().equals(Status.IN_PROGRESS)) {
-            subtask.setSubtaskStatus(Status.DONE);
-            mapStatusSubtask.put(id, Status.DONE);
+    public void updateSubtask(Subtask subtask) throws InvalidValueException {
+        boolean check = false;
+        for (Map.Entry<Integer, Subtask> subtaskEntry : subtaskTable.entrySet()) {
+            if (subtaskEntry.getValue().getTaskTitle().equals(subtask.getTaskTitle())) {
+                int id = subtaskEntry.getKey();
+                subtask.setSubtaskStatus(subtaskEntry.getValue().getSubtaskStatus());
+                subtask.setTaskId(id);
+                check = true;
+                subtaskTable.put(id, subtask);
+                if (subtask.getSubtaskStatus().equals(Status.NEW)) {
+                    subtask.setSubtaskStatus(Status.IN_PROGRESS);
+                    mapStatusSubtask.put(id, Status.IN_PROGRESS);
+                } else if (subtask.getSubtaskStatus().equals(Status.IN_PROGRESS)) {
+                    subtask.setSubtaskStatus(Status.DONE);
+                    mapStatusSubtask.put(id, Status.DONE);
+                }
+            }
+        }
+        if (!check) {
+            throw new InvalidValueException("Подзадача удалена или не вводилась");
         }
     }
 
@@ -160,13 +232,18 @@ public class InMemoryTaskManager implements TaskManager {
 
     @Override
     public void clearAllSubtasks() {
+        for (Integer id : subtaskTable.keySet()) {
+            if (listOfTasksIdForHistory.contains(id)) {
+                listOfTasksIdForHistory.remove(id);
+            }
+        }
         subtaskTable.clear();
     }
 
     @Override
-    public void outputByIdSubtasks(Integer id) {
+    public void outputByIdSubtasks(Integer id) throws InvalidValueException {
         if (!subtaskTable.containsKey(id)) {
-            System.out.println("Подзадача с данным id удалена или не вводилась");
+            throw new InvalidValueException("Подзадача с данным id удалена или не вводилась");
         } else {
             historyManager.add(subtaskTable.get(id));
             if (listOfTasksIdForHistory.contains(id)){
@@ -180,19 +257,13 @@ public class InMemoryTaskManager implements TaskManager {
     }
 
     @Override
-    public void clearByIdSubtasks(Integer id) {
-        subtaskTable.remove(id);
-        System.out.println("Подадача с id = " + id + " удалена");
-    }
-
-    @Override
-    public void SubtaskByEpic(ArrayList<Integer> epicListId) {
-        for (Integer integer : epicListId) {
-            for (Integer key : subtaskTable.keySet()) {
-                if(integer.equals(key)){
-                    System.out.println(subtaskTable.get(key));
-                }
-            }
+    public void clearByIdSubtasks(Integer id) throws InvalidValueException {
+        if (subtaskTable.containsKey(id)) {
+            subtaskTable.remove(id);
+            listOfTasksIdForHistory.remove(id);
+            System.out.println("Подзадача с id = " + id + " удалена");
+        } else {
+            throw new InvalidValueException("Подзадача с данным id удалена или не вводилась");
         }
     }
 
@@ -204,10 +275,11 @@ public class InMemoryTaskManager implements TaskManager {
             for (Integer key : mapStatusSubtask.keySet()) {
                 if(integer.equals(key)){
                     count++;
-                    if(mapStatusSubtask.get(key).equals(Status.IN_PROGRESS)){
+                    if(mapStatusSubtask.get(key).equals(Status.IN_PROGRESS) || mapStatusSubtask.get(key).equals(Status.DONE)) {
                         epic.setEpicStatus(Status.IN_PROGRESS);
-                    } else if (mapStatusSubtask.get(key).equals(Status.DONE)){
-                        countDone++;
+                        if (mapStatusSubtask.get(key).equals(Status.DONE)) {
+                            countDone++;
+                        }
                     }
                 }
             }
@@ -217,8 +289,10 @@ public class InMemoryTaskManager implements TaskManager {
         }
     }
 
+
+
     @Override
-    public List<Task> getHistory(){
+    public List<Task> getHistory() throws InvalidValueException {
         return historyManager.getHistory();
     }
 

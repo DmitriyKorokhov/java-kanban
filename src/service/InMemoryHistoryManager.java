@@ -41,11 +41,11 @@ public class InMemoryHistoryManager implements HistoryManager {
             node.item = null;
         }
 
-        public List<Task> getTasks() {
+        public List<Task> getTasks() throws InvalidValueException {
             List<Task> historyManager = new ArrayList<>();
             Node currentNode = first;
             if (currentNode == null) {
-                System.out.println("Список пустой");
+                throw new InvalidValueException("Список пустой");
             } else {
                 while (currentNode != null) {
                     if (historyManager.size() == 10) {
@@ -63,7 +63,7 @@ public class InMemoryHistoryManager implements HistoryManager {
     }
 
     @Override
-    public List<Task> getHistory() {
+    public List<Task> getHistory() throws InvalidValueException {
         return customLinkedList.getTasks();
     }
 
