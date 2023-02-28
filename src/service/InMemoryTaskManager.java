@@ -201,23 +201,19 @@ public class InMemoryTaskManager implements TaskManager  {
 
     @Override
     public void clearByIdEpic(Integer id) throws InvalidValueException {
-        try {
-            if (epicTable.containsKey(id)) {
-                epicTable.remove(id);
-                listOfTasksIdForHistory.remove(id);
-                System.out.println("Эпик с id = " + id + " удален");
-                if (!mapIdSubtaskByEpic.isEmpty()) {
-                    ArrayList<Integer> listOfIdSubtask = mapIdSubtaskByEpic.get(id);
-                    for (Integer idSubtask : listOfIdSubtask) {
-                        subtaskTable.remove(idSubtask);
-                    }
+        if (epicTable.containsKey(id)) {
+            epicTable.remove(id);
+            listOfTasksIdForHistory.remove(id);
+            System.out.println("Эпик с id = " + id + " удален");
+            if (!mapIdSubtaskByEpic.isEmpty()) {
+                ArrayList<Integer> listOfIdSubtask = mapIdSubtaskByEpic.get(id);
+                for (Integer idSubtask : listOfIdSubtask) {
+                    subtaskTable.remove(idSubtask);
                 }
-            } else {
-                throw new InvalidValueException("Эпик с данным id удалена или не вводилась");
             }
-        } catch (InvalidValueException e) {
-            System.out.println(e.getMessage());
+            return;
         }
+        throw new InvalidValueException("Эпик с данным id удалена или не вводилась");
     }
 
     @Override

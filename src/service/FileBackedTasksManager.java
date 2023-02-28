@@ -66,8 +66,18 @@ public class FileBackedTasksManager extends InMemoryTaskManager implements TaskM
 
         System.out.println("Добавление эпика 1");
         fileBackedTasksManager.saveEpic(epicOne);
-        System.out.println("Добавление эпика 2");
+
         fileBackedTasksManager.saveEpic(epicTwo);
+
+        System.out.println("clear эпика 2 - 1");
+        fileBackedTasksManager.clearByIdEpic(2);
+
+        System.out.println("clear эпика 2 - 2");
+        fileBackedTasksManager.clearByIdEpic(2);
+
+        fileBackedTasksManager.outputAllTasks();
+
+       /*
         System.out.println("Добавление подзадачи 1 для 1 эпика");
         fileBackedTasksManager.saveSubtask(subtaskOne1, epicOne, epicOne.getEpicListId());
         System.out.println("Добавление подзадачи 2 для 1 эпика");
@@ -82,7 +92,8 @@ public class FileBackedTasksManager extends InMemoryTaskManager implements TaskM
         fileBackedTasksManager.outputAllSubtasks();
         System.out.println("Вывод всех задач по сортировке");
         System.out.println(fileBackedTasksManager.getPrioritizedTasks());
-/*
+
+
         System.out.println("Удаляю задачу с id = 1");
         fileBackedTasksManager.clearByIdTask(1);
         System.out.println("Вывод всех задач");
