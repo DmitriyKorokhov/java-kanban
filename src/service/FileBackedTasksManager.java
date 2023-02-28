@@ -21,7 +21,7 @@ public class FileBackedTasksManager extends InMemoryTaskManager implements TaskM
         this.file = file;
     }
 
-    public static void main(String[] args) throws InvalidValueException {
+    public static void main(String[] args) throws InvalidValueException, TimeIntersectionException {
         FileBackedTasksManager fileBackedTasksManager = Managers.getDefaultFileBackedTasksManager();
 
         String taskTitleOne = "Переезд";
@@ -45,13 +45,13 @@ public class FileBackedTasksManager extends InMemoryTaskManager implements TaskM
         String subtaskTitleOne1 = "Распределение вещей";
         String subtaskSpecificationOne1 = "Вещи будут распределены по соответствующим коробкам в определенном порядке";
         LocalDateTime subtask1StartTime = LocalDateTime.of(2023, Month.NOVEMBER, 2, 12, 25);
-        Duration subtask1Duration = Duration.ofHours(2);
+        Duration subtask1Duration = Duration.ofHours(10);
         Subtask subtaskOne1 = new Subtask(subtaskTitleOne1, subtaskSpecificationOne1, epicOne.getTaskId(), subtask1StartTime, subtask1Duration);
 
         String subtaskTitleOne2 = "Упаковка";
         String subtaskSpecificationOne2 = "Распределенные вещи нужно аккуратно упаковать";
-        LocalDateTime subtask2StartTime = LocalDateTime.of(2023, Month.DECEMBER, 6, 12, 11);
-        Duration subtask2Duration = Duration.ofHours(1);
+        LocalDateTime subtask2StartTime = LocalDateTime.of(2023, Month.NOVEMBER, 2, 11, 11);
+        Duration subtask2Duration = Duration.ofHours(2);
         Subtask subtaskOne2 = new Subtask(subtaskTitleOne2, subtaskSpecificationOne2, epicOne.getTaskId(), subtask2StartTime, subtask2Duration);
 
         String subtaskTitleOne3 = "Упаковка";
@@ -64,13 +64,6 @@ public class FileBackedTasksManager extends InMemoryTaskManager implements TaskM
         System.out.println("Добавление задачи 2");
         fileBackedTasksManager.saveTask(taskTwo);
 
-        System.out.println("clear 1");
-        fileBackedTasksManager.clearByIdTask(0);
-        System.out.println("clear 2");
-        fileBackedTasksManager.clearByIdTask(0);
-        System.out.println("Вывод всех задач");
-        fileBackedTasksManager.outputAllTasks();
-        /*
         System.out.println("Добавление эпика 1");
         fileBackedTasksManager.saveEpic(epicOne);
         System.out.println("Добавление эпика 2");
@@ -89,7 +82,7 @@ public class FileBackedTasksManager extends InMemoryTaskManager implements TaskM
         fileBackedTasksManager.outputAllSubtasks();
         System.out.println("Вывод всех задач по сортировке");
         System.out.println(fileBackedTasksManager.getPrioritizedTasks());
-        /*
+/*
         System.out.println("Удаляю задачу с id = 1");
         fileBackedTasksManager.clearByIdTask(1);
         System.out.println("Вывод всех задач");
@@ -106,7 +99,7 @@ public class FileBackedTasksManager extends InMemoryTaskManager implements TaskM
         fileBackedTasksManager.outputByIdSubtasks(6);
         System.out.println("Вывод истории");
         System.out.println(fileBackedTasksManager.getHistory());
-  /*
+/*
 
         FileBackedTasksManager newFileBackedTasksManager = loadFromFile("file.csv");
         System.out.println("Вывод всех задач");
@@ -257,7 +250,7 @@ public class FileBackedTasksManager extends InMemoryTaskManager implements TaskM
     }
 
     @Override
-    public void saveTask(Task task) {
+    public void saveTask(Task task) throws TimeIntersectionException {
         super.saveTask(task);
         save();
     }
@@ -269,7 +262,7 @@ public class FileBackedTasksManager extends InMemoryTaskManager implements TaskM
     }
 
     @Override
-    public void outputAllTasks() {
+    public void outputAllTasks() throws InvalidValueException {
         super.outputAllTasks();
     }
 
@@ -304,7 +297,7 @@ public class FileBackedTasksManager extends InMemoryTaskManager implements TaskM
     }
 
     @Override
-    public void outputAllEpics() {
+    public void outputAllEpics() throws InvalidValueException {
         super.outputAllEpics();
     }
 
@@ -333,13 +326,13 @@ public class FileBackedTasksManager extends InMemoryTaskManager implements TaskM
     }
 
     @Override
-    public void updateSubtask(Subtask subtask) throws InvalidValueException {
+    public void updateSubtask(Subtask subtask) {
         super.updateSubtask(subtask);
         save();
     }
 
     @Override
-    public void outputAllSubtasks() {
+    public void outputAllSubtasks() throws InvalidValueException {
         super.outputAllSubtasks();
     }
 

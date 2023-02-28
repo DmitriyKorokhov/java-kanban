@@ -12,11 +12,11 @@ import java.util.Set;
 public interface TaskManager {
     Set<Task> getPrioritizedTasks();
 
-    void saveTask(Task task);
+    void saveTask(Task task) throws TimeIntersectionException;
 
     void updateTask(Task task) throws InvalidValueException;
 
-    void outputAllTasks();
+    void outputAllTasks() throws InvalidValueException;
 
     void clearAllTasks();
 
@@ -28,7 +28,7 @@ public interface TaskManager {
 
     void updateEpic(Epic epic) throws InvalidValueException;
 
-    void outputAllEpics();
+    void outputAllEpics() throws InvalidValueException;
 
     void clearAllEpics();
 
@@ -36,11 +36,11 @@ public interface TaskManager {
 
     void clearByIdEpic(Integer id) throws InvalidValueException;
 
-    void saveSubtask(Subtask subtask, Epic epic, ArrayList<Integer> epicListId);
+    void saveSubtask(Subtask subtask, Epic epic, ArrayList<Integer> epicListId) throws TimeIntersectionException;
 
     void updateSubtask(Subtask subtask) throws InvalidValueException;
 
-    void outputAllSubtasks();
+    void outputAllSubtasks() throws InvalidValueException;
 
     void clearAllSubtasks();
 

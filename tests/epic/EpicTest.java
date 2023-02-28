@@ -3,8 +3,10 @@ import model.Epic;
 import model.Status;
 import model.Subtask;
 import org.junit.jupiter.api.Test;
+import service.InvalidValueException;
 import service.Managers;
 import service.TaskManager;
+import service.TimeIntersectionException;
 
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -21,7 +23,7 @@ class EpicTest {
     }
 
     @Test
-    public void returnNEWWhenAllSubtaskAreNew() {
+    public void returnNEWWhenAllSubtaskAreNew() throws TimeIntersectionException {
         taskManager.saveEpic(epic);
         taskManager.saveSubtask(subtask1,epic, epic.getEpicListId());
         taskManager.saveSubtask(subtask2,epic, epic.getEpicListId());
@@ -29,7 +31,7 @@ class EpicTest {
     }
 
     @Test
-    public void returnDONEWhenAllSubtaskAreDone() {
+    public void returnDONEWhenAllSubtaskAreDone() throws TimeIntersectionException, InvalidValueException {
         taskManager.saveEpic(epic);
         taskManager.saveSubtask(subtask1,epic, epic.getEpicListId());
         subtask1 = new Subtask("Subtask1", "Test description - 1 - 1", epic.getTaskId());
@@ -46,7 +48,7 @@ class EpicTest {
     }
 
     @Test
-    public void returnIN_PROGRESSWhenAllSubtaskAreDoneAndNew() {
+    public void returnIN_PROGRESSWhenAllSubtaskAreDoneAndNew() throws TimeIntersectionException, InvalidValueException {
         taskManager.saveEpic(epic);
         taskManager.saveSubtask(subtask1,epic, epic.getEpicListId());
         taskManager.saveSubtask(subtask2,epic, epic.getEpicListId());
@@ -59,7 +61,7 @@ class EpicTest {
     }
 
     @Test
-    public void returnIN_PROGRESSWhenAllSubtaskAreInProgress() {
+    public void returnIN_PROGRESSWhenAllSubtaskAreInProgress() throws TimeIntersectionException, InvalidValueException {
         taskManager.saveEpic(epic);
         taskManager.saveSubtask(subtask1,epic, epic.getEpicListId());
         subtask1 = new Subtask("Subtask1", "Test description - 1 - 1", epic.getTaskId());

@@ -2,10 +2,7 @@ package historymanger;
 
 import model.Task;
 import org.junit.jupiter.api.Test;
-import service.HistoryManager;
-import service.InvalidValueException;
-import service.Managers;
-import service.TaskManager;
+import service.*;
 
 import java.util.List;
 
@@ -16,7 +13,7 @@ class HistoryManagerTest {
     private final TaskManager taskManager = Managers.getDefault();
 
     @Test
-    public void addTaskToTheHistory() {
+    public void addTaskToTheHistory() throws InvalidValueException {
         Task task = new Task("Task", "Test description");
         historyManager.add(task);
         final List<Task> history = historyManager.getHistory();
@@ -31,7 +28,7 @@ class HistoryManagerTest {
     }
 
     @Test
-    public void duplicationOfTasks() {
+    public void duplicationOfTasks() throws InvalidValueException {
         Task task = new Task("Task", "Test description");
         historyManager.add(task);
         historyManager.add(task);
@@ -40,7 +37,7 @@ class HistoryManagerTest {
     }
 
     @Test
-    public void deleteFromTheHistoryAtTheBeginning() {
+    public void deleteFromTheHistoryAtTheBeginning() throws TimeIntersectionException, InvalidValueException {
         Task taskOne = new Task("TaskOne", "Test description - 1");
         taskManager.saveTask(taskOne);
         final int taskOneId = taskOne.getTaskId();
@@ -58,7 +55,7 @@ class HistoryManagerTest {
     }
 
     @Test
-    public void deleteFromTheHistoryAtTheMiddle() {
+    public void deleteFromTheHistoryAtTheMiddle() throws TimeIntersectionException, InvalidValueException {
         Task taskOne = new Task("TaskOne", "Test description - 1");
         taskManager.saveTask(taskOne);
         historyManager.add(taskOne);
@@ -76,7 +73,7 @@ class HistoryManagerTest {
     }
 
     @Test
-    public void deleteFromTheHistoryAtTheEnd() {
+    public void deleteFromTheHistoryAtTheEnd() throws TimeIntersectionException, InvalidValueException {
         Task taskOne = new Task("TaskOne", "Test description - 1");
         taskManager.saveTask(taskOne);
         historyManager.add(taskOne);
@@ -92,5 +89,4 @@ class HistoryManagerTest {
         assertFalse(history.contains(taskThree), "Задача не удалена");
         assertEquals(2, history.size(), "Неверное количество элементов в истории.");
     }
-
 }

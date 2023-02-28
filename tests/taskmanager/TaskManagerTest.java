@@ -8,6 +8,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import service.InvalidValueException;
 import service.TaskManager;
+import service.TimeIntersectionException;
 
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -19,7 +20,7 @@ abstract class TaskManagerTest <T extends TaskManager> {
     }
 
     @Test
-    public void saveAStandardTask() {
+    public void saveAStandardTask() throws TimeIntersectionException {
         Task task = new Task("Testing the Task", "Test description");
         taskManager.saveTask(task);
         final int taskId = task.getTaskId();
@@ -36,7 +37,7 @@ abstract class TaskManagerTest <T extends TaskManager> {
     }
 
     @Test
-    public void updateStatusWhenTaskIsCreatedOrUpdated() {
+    public void updateStatusWhenTaskIsCreatedOrUpdated() throws TimeIntersectionException, InvalidValueException {
         Task task = new Task("Testing the Task", "Test description");
         taskManager.saveTask(task);
         assertEquals(Status.NEW, task.getTaskStatus());
@@ -52,11 +53,11 @@ abstract class TaskManagerTest <T extends TaskManager> {
     public void updateStatusWhenATaskListIsEmpty() {
         Task task = new Task("Test Task", "Testing an update Task");
         InvalidValueException ex = assertThrows(InvalidValueException.class, () -> taskManager.updateTask(task));
-        assertEquals("Задача удалена или не вводилась", ex.getMessage());
+        assertEquals("Данная задача или не существует, или пересекается по времени с другими задачами", ex.getMessage());
     }
 
     @Test
-    public void clearTaskByIdWithAFilledList() {
+    public void clearTaskByIdWithAFilledList() throws TimeIntersectionException, InvalidValueException {
         Task taskOne = new Task("Testing the TaskOne", "Test description");
         taskManager.saveTask(taskOne);
         final int id = 0;
@@ -79,7 +80,7 @@ abstract class TaskManagerTest <T extends TaskManager> {
     }
 
     @Test
-    public void clearANonexistentTaskId() {
+    public void clearANonexistentTaskId() throws TimeIntersectionException {
         Task task = new Task("Testing the Task", "Test description");
         taskManager.saveTask(task);
         final int id = 1;
@@ -91,7 +92,7 @@ abstract class TaskManagerTest <T extends TaskManager> {
     }
 
     @Test
-    public void clearAllTasks() {
+    public void clearAllTasks() throws TimeIntersectionException {
         Task task = new Task("Testing the Task", "Test description");
         taskManager.saveTask(task);
         taskManager.clearAllTasks();
@@ -99,7 +100,7 @@ abstract class TaskManagerTest <T extends TaskManager> {
     }
 
     @Test
-    public void outputByIdTaskWithAFilledList() {
+    public void outputByIdTaskWithAFilledList() throws TimeIntersectionException, InvalidValueException {
         Task taskOne = new Task("Testing the TaskOne", "Test description");
         taskManager.saveTask(taskOne);
         Task taskTwo = new Task("Testing the TaskTwo", "Test description");
@@ -118,7 +119,7 @@ abstract class TaskManagerTest <T extends TaskManager> {
     }
 
     @Test
-    public void outputByIdTaskWithAnInvalidId() {
+    public void outputByIdTaskWithAnInvalidId() throws TimeIntersectionException {
         Task task = new Task("Testing the Task", "Test description");
         taskManager.saveTask(task);
         final int id = 1;
@@ -145,7 +146,7 @@ abstract class TaskManagerTest <T extends TaskManager> {
     }
 
     @Test
-    public void updateStatusWhenEpicIsCreatedOrUpdated() {
+    public void updateStatusWhenEpicIsCreatedOrUpdated() throws InvalidValueException {
         Epic epic = new Epic("Testing the Epic", "Epic description");
         taskManager.saveEpic(epic);
         final int epicId = epic.getTaskId();
@@ -161,11 +162,11 @@ abstract class TaskManagerTest <T extends TaskManager> {
     public void updateStatusWhenAEpicListIsEmpty() {
         Epic epic = new Epic("Test Epic", "Testing an update Epic");
         InvalidValueException ex = assertThrows(InvalidValueException.class, () -> taskManager.updateEpic(epic));
-        assertEquals("Задача удалена или не вводилась", ex.getMessage());
+        assertEquals("Данный эпик или не существует, или пересекается по времени с другими задачами", ex.getMessage());
     }
 
     @Test
-    public void clearEpicByIdWithAFilledList() {
+    public void clearEpicByIdWithAFilledList() throws TimeIntersectionException, InvalidValueException {
         Epic epicOne = new Epic("Testing the EpicOne", "Test description");
         taskManager.saveEpic(epicOne);
         final int epicId = epicOne.getTaskId();
@@ -194,7 +195,7 @@ abstract class TaskManagerTest <T extends TaskManager> {
     }
 
     @Test
-    public void clearANonexistentEpicId() {
+    public void clearANonexistentEpicId(){
         Epic epic = new Epic("Testing the Epic", "Test description");
         taskManager.saveEpic(epic);
         final int id = 1;
@@ -214,7 +215,7 @@ abstract class TaskManagerTest <T extends TaskManager> {
     }
 
     @Test
-    public void outputByIdEpicWithAFilledList() {
+    public void outputByIdEpicWithAFilledList() throws InvalidValueException {
         Epic epicOne = new Epic("Testing the EpicOne", "Test description");
         taskManager.saveEpic(epicOne);
         Epic epicTwo = new Epic("Testing the EpicTwo", "Test description");
@@ -243,7 +244,7 @@ abstract class TaskManagerTest <T extends TaskManager> {
     }
 
     @Test
-    public void saveAStandardSubtask() {
+    public void saveAStandardSubtask() throws TimeIntersectionException {
         Epic epic = new Epic("Epic", "Test description");
         taskManager.saveEpic(epic);
         Subtask subtask = new Subtask("Testing the Subtask", "Test description", epic.getTaskId());
@@ -263,7 +264,7 @@ abstract class TaskManagerTest <T extends TaskManager> {
     }
 
     @Test
-    public void updateStatusWhenSubtaskIsCreatedOrUpdated() {
+    public void updateStatusWhenSubtaskIsCreatedOrUpdated() throws TimeIntersectionException, InvalidValueException {
         Epic epic = new Epic("Epic", "Test description");
         taskManager.saveEpic(epic);
         Subtask subtask = new Subtask("Testing the Subtask", "Test description", epic.getTaskId());
@@ -281,11 +282,12 @@ abstract class TaskManagerTest <T extends TaskManager> {
     public void updateStatusWhenASubtaskListIsEmpty() {
         Subtask subtask = new Subtask("Testing the Subtask", "Test description", 0);
         InvalidValueException ex = assertThrows(InvalidValueException.class, () -> taskManager.updateSubtask(subtask));
-        assertEquals("Подзадача удалена или не вводилась", ex.getMessage());
+        assertEquals("Данная подзадача или не существует, или пересекается по времени с другими задачами", ex.getMessage());
+
     }
 
     @Test
-    public void clearSubtaskByIdWithAFilledList() {
+    public void clearSubtaskByIdWithAFilledList() throws TimeIntersectionException, InvalidValueException {
         Epic epic = new Epic("Epic", "Test description");
         taskManager.saveEpic(epic);
         Subtask subtaskOne = new Subtask("Testing the SubtaskOne", "Test description - 1", epic.getTaskId());
@@ -310,7 +312,7 @@ abstract class TaskManagerTest <T extends TaskManager> {
     }
 
     @Test
-    public void clearANonexistentSubtaskId() {
+    public void clearANonexistentSubtaskId() throws TimeIntersectionException {
         Epic epic = new Epic("Epic", "Test description");
         taskManager.saveEpic(epic);
         Subtask subtask = new Subtask("Testing the Subtask", "Test description", epic.getTaskId());
@@ -324,7 +326,7 @@ abstract class TaskManagerTest <T extends TaskManager> {
     }
 
     @Test
-    public void clearAllSubtasks() {
+    public void clearAllSubtasks() throws TimeIntersectionException {
         Epic epic = new Epic("Epic", "Test description");
         taskManager.saveEpic(epic);
         Subtask subtask = new Subtask("Testing the Subtask", "Test description", epic.getTaskId());
@@ -334,7 +336,7 @@ abstract class TaskManagerTest <T extends TaskManager> {
     }
 
     @Test
-    public void outputByIdSubtaskWithAFilledList() {
+    public void outputByIdSubtaskWithAFilledList() throws TimeIntersectionException, InvalidValueException {
         Epic epic = new Epic("Epic", "Test description");
         taskManager.saveEpic(epic);
         Subtask subtaskOne = new Subtask("Testing the SubtaskOne", "Test description - 1", epic.getTaskId());
@@ -355,7 +357,7 @@ abstract class TaskManagerTest <T extends TaskManager> {
     }
 
     @Test
-    public void outputByIdSubtaskWithAnInvalidId() {
+    public void outputByIdSubtaskWithAnInvalidId() throws TimeIntersectionException {
         Epic epic = new Epic("Epic", "Test description");
         taskManager.saveEpic(epic);
         Subtask subtask = new Subtask("Testing the Subtask", "Test description", epic.getTaskId());
@@ -367,7 +369,7 @@ abstract class TaskManagerTest <T extends TaskManager> {
     }
 
     @Test
-    public void presenceOfATaskInASubtask() {
+    public void presenceOfATaskInASubtask() throws TimeIntersectionException {
         Epic epic = new Epic("Epic", "Test description");
         taskManager.saveEpic(epic);
         Subtask subtask = new Subtask("Testing the Subtask", "Test description", epic.getTaskId());
@@ -377,7 +379,7 @@ abstract class TaskManagerTest <T extends TaskManager> {
     }
 
     @Test
-    public void deletingASubtaskWhenDeletingAnEpic() {
+    public void deletingASubtaskWhenDeletingAnEpic() throws TimeIntersectionException, InvalidValueException {
         Epic epic = new Epic("Epic", "Test description");
         taskManager.saveEpic(epic);
         final int epicId = epic.getTaskId();
@@ -389,7 +391,7 @@ abstract class TaskManagerTest <T extends TaskManager> {
     }
 
     @Test
-    public void findingOutTheEpicStatus() {
+    public void findingOutTheEpicStatus() throws TimeIntersectionException, InvalidValueException {
         Epic epic = new Epic("Epic", "Test description");
         taskManager.saveEpic(epic);
         Subtask subtask = new Subtask("Testing the Subtask", "Test description", epic.getTaskId());
