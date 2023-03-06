@@ -10,6 +10,10 @@ import service.InvalidValueException;
 import service.TaskManager;
 import service.TimeIntersectionException;
 
+import java.time.Duration;
+import java.time.LocalDateTime;
+import java.time.Month;
+
 import static org.junit.jupiter.api.Assertions.*;
 
 abstract class TaskManagerTest <T extends TaskManager> {
@@ -28,7 +32,52 @@ abstract class TaskManagerTest <T extends TaskManager> {
         assertNotNull(savedTask, "Задача не найдена.");
         assertEquals(task, savedTask, "Задачи не совпадают.");
         assertEquals(1, taskManager.getTaskTable().size(), "Неверное количество задач.");
-        assertEquals(task, taskManager.getTaskTable().get(taskId), "Задачи не совпадают.");
+        assertTrue(taskManager.getPrioritizedTasks().contains(task));
+        assertEquals(1, taskManager.getPrioritizedTasks().size(), "Неверное количество отсортированных по времени задач.");
+    }
+
+    @Test
+    public void saveATaskNotOverlapInTime() throws TimeIntersectionException {
+        LocalDateTime task1StartTime = LocalDateTime.of(2023, Month.NOVEMBER, 2, 12, 25);
+        Duration task1Duration = Duration.ofHours(10);
+        Task taskOne = new Task("Testing the Task - 1", "Test description", task1StartTime, task1Duration);
+        taskManager.saveTask(taskOne);
+        final int taskOneId = taskOne.getTaskId();
+        final Task savedTaskOne = taskManager.getTaskTable().get(taskOneId);
+        LocalDateTime task2StartTime = LocalDateTime.of(2023, Month.DECEMBER, 3, 11, 11);
+        Duration task2Duration = Duration.ofHours(20);
+        Task taskTwo = new Task("Testing the Task - 2", "Test description", task2StartTime, task2Duration);
+        taskManager.saveTask(taskTwo);
+        final int taskTwoId = taskTwo.getTaskId();
+        final Task savedTaskTwo = taskManager.getTaskTable().get(taskTwoId);
+        assertNotNull(savedTaskOne, "Задача 1 не найдена.");
+        assertNotNull(savedTaskTwo, "Задача 2 не найдена.");
+        assertEquals(taskOne, savedTaskOne, "Задачи 1 не совпадают.");
+        assertEquals(taskTwo, savedTaskTwo, "Задачи 2 не совпадают.");
+        assertEquals(2, taskManager.getTaskTable().size(), "Неверное количество задач.");
+        assertEquals(2, taskManager.getPrioritizedTasks().size(), "Неверное количество отсортированных по времени задач.");
+    }
+
+    @Test
+    public void saveATaskOverlapInTime() throws TimeIntersectionException {
+        LocalDateTime task1StartTime = LocalDateTime.of(2023, Month.NOVEMBER, 2, 12, 25);
+        Duration task1Duration = Duration.ofDays(10);
+        Task taskOne = new Task("Testing the Task - 1", "Test description", task1StartTime, task1Duration);
+        taskManager.saveTask(taskOne);
+        final int taskOneId = taskOne.getTaskId();
+        final Task savedTaskOne = taskManager.getTaskTable().get(taskOneId);
+        LocalDateTime task2StartTime = LocalDateTime.of(2023, Month.NOVEMBER, 6, 2, 19);
+        Duration task2Duration = Duration.ofHours(20);
+        Task taskTwo = new Task("Testing the Task - 2", "Test description", task2StartTime, task2Duration);
+        TimeIntersectionException ex = assertThrows(TimeIntersectionException.class, () -> taskManager.saveTask(taskTwo));
+        assertEquals("Задача пересекается по времени с другими задачами", ex.getMessage(), "Задачи не пересекаются");
+        final int taskTwoId = taskTwo.getTaskId();
+        final Task savedTaskTwo = taskManager.getTaskTable().get(taskTwoId);
+        assertNotNull(savedTaskOne, "Задача 1 не найдена.");
+        assertEquals(taskOne, savedTaskOne, "Задачи 1 не совпадают.");
+        assertNotEquals(taskTwo, savedTaskTwo, "Задача 2 совпадает.");
+        assertEquals(1, taskManager.getTaskTable().size(), "Неверное количество задач.");
+        assertEquals(1, taskManager.getPrioritizedTasks().size(), "Неверное количество отсортированных по времени задач.");
     }
 
     @Test
@@ -41,19 +90,70 @@ abstract class TaskManagerTest <T extends TaskManager> {
         Task task = new Task("Testing the Task", "Test description");
         taskManager.saveTask(task);
         assertEquals(Status.NEW, task.getTaskStatus());
-        task = new Task("Testing the Task", "Testing an update Task - 1");
+        LocalDateTime task1StartTime = LocalDateTime.of(2023, Month.NOVEMBER, 2, 12, 25);
+        Duration task1Duration = Duration.ofDays(10);
+        task = new Task("Testing the Task", "Testing an update Task - 1", task1StartTime, task1Duration);
         taskManager.updateTask(task);
         assertEquals(Status.IN_PROGRESS, task.getTaskStatus());
-        task = new Task("Testing the Task", "Testing an update Task - 2");
+        assertEquals(task1StartTime, task.getTaskStartTime(), "Неверная дата");
+        assertEquals(task1Duration, task.getTaskDuration(), "Неверная продолжительность");
+        LocalDateTime task2StartTime = LocalDateTime.of(2025, Month.DECEMBER, 9, 11, 19);
+        Duration task2Duration = Duration.ofDays(10);
+        task = new Task("Testing the Task", "Testing an update Task - 2", task2StartTime, task2Duration);
         taskManager.updateTask(task);
         assertEquals(Status.DONE, task.getTaskStatus());
+        assertEquals(task2StartTime, task.getTaskStartTime(), "Неверная дата");
+        assertEquals(task2Duration, task.getTaskDuration(), "Неверная продолжительность");
     }
 
     @Test
     public void updateStatusWhenATaskListIsEmpty() {
         Task task = new Task("Test Task", "Testing an update Task");
         InvalidValueException ex = assertThrows(InvalidValueException.class, () -> taskManager.updateTask(task));
-        assertEquals("Данная задача или не существует, или пересекается по времени с другими задачами", ex.getMessage());
+        assertEquals("Данной задачи не существует", ex.getMessage());
+    }
+
+    @Test
+    public void updateStatusATaskNotOverlapInTime() throws TimeIntersectionException, InvalidValueException {
+        LocalDateTime task1StartTime = LocalDateTime.of(2023, Month.NOVEMBER, 2, 12, 25);
+        Duration task1Duration = Duration.ofHours(10);
+        Task taskOne = new Task("Testing the Task - 1", "Test description", task1StartTime, task1Duration);
+        taskManager.saveTask(taskOne);
+        final int oldTaskOneId = taskOne.getTaskId();
+        final Task oldSavedTaskOne = taskManager.getTaskTable().get(oldTaskOneId);
+        LocalDateTime task2StartTime = LocalDateTime.of(2023, Month.DECEMBER, 3, 11, 11);
+        Duration task2Duration = Duration.ofHours(20);
+        Task taskTwo = new Task("Testing the Task - 2", "Test description", task2StartTime, task2Duration);
+        taskManager.saveTask(taskTwo);
+        LocalDateTime newTask1StartTime = LocalDateTime.of(2023, Month.NOVEMBER, 2, 12, 25);
+        Duration newTask1Duration = Duration.ofHours(10);
+        taskOne = new Task("Testing the Task - 1", "Testing an update Task - 1", newTask1StartTime, newTask1Duration);
+        taskManager.updateTask(taskOne);
+        final int taskOneId = taskOne.getTaskId();
+        final Task savedTaskOne = taskManager.getTaskTable().get(taskOneId);
+        assertNotEquals(oldSavedTaskOne, savedTaskOne, "Старая и новая задачи 1 совпадают.");
+        assertEquals(2, taskManager.getTaskTable().size(), "Неверное количество задач.");
+        assertEquals(Status.IN_PROGRESS, taskOne.getTaskStatus());
+    }
+
+    @Test
+    public void updateStatusATaskOverlapInTime() throws TimeIntersectionException{
+        LocalDateTime task1StartTime = LocalDateTime.of(2023, Month.NOVEMBER, 2, 12, 25);
+        Duration task1Duration = Duration.ofHours(10);
+        Task taskOne = new Task("Testing the Task - 1", "Test description", task1StartTime, task1Duration);
+        taskManager.saveTask(taskOne);
+        LocalDateTime task2StartTime = LocalDateTime.of(2023, Month.DECEMBER, 3, 11, 11);
+        Duration task2Duration = Duration.ofHours(20);
+        Task taskTwo = new Task("Testing the Task - 2", "Test description", task2StartTime, task2Duration);
+        taskManager.saveTask(taskTwo);
+        LocalDateTime newTask1StartTime = LocalDateTime.of(2023, Month.DECEMBER, 3, 2, 19);
+        Duration newTask1Duration = Duration.ofDays(20);
+        taskOne = new Task("Testing the Task - 1", "Testing an update Task - 1", newTask1StartTime, newTask1Duration);
+        Task finalTaskOne = taskOne;
+        TimeIntersectionException ex = assertThrows(TimeIntersectionException.class, () -> taskManager.updateTask(finalTaskOne));
+        assertEquals("Задача пересекается по времени с другими задачами", ex.getMessage());
+        assertEquals(2, taskManager.getTaskTable().size(), "Неверное количество задач.");
+        assertEquals(Status.NEW, taskOne.getTaskStatus());
     }
 
     @Test
@@ -63,10 +163,13 @@ abstract class TaskManagerTest <T extends TaskManager> {
         final int id = 0;
         Task taskTwo = new Task("Testing the TaskTwo", "Test description");
         taskManager.saveTask(taskTwo);
+        assertEquals(2, taskManager.getTaskTable().size(), "Неверное количество задач.");
+        assertEquals(2, taskManager.getPrioritizedTasks().size(), "Неверное количество отсортированных по времени задач.");
         taskManager.clearByIdTask(id);
         final Task savedTask = taskManager.getTaskTable().get(id);
         assertNull(savedTask, "Задача найдена.");
         assertEquals(1, taskManager.getTaskTable().size(), "Неверное количество задач.");
+        assertEquals(1, taskManager.getPrioritizedTasks().size(), "Неверное количество отсортированных по времени задач.");
     }
 
     @Test
@@ -77,6 +180,7 @@ abstract class TaskManagerTest <T extends TaskManager> {
         assertEquals("Задача с данным id удалена или не вводилась", ex.getMessage());
         assertNull(savedTask, "Задача найдена.");
         assertEquals(0, taskManager.getTaskTable().size(), "Неверное количество задач.");
+        assertEquals(0, taskManager.getPrioritizedTasks().size(), "Неверное количество отсортированных по времени задач.");
     }
 
     @Test
@@ -89,6 +193,7 @@ abstract class TaskManagerTest <T extends TaskManager> {
         assertEquals("Задача с данным id удалена или не вводилась", ex.getMessage());
         assertNull(savedTask, "Задача найдена.");
         assertEquals(1, taskManager.getTaskTable().size(), "Неверное количество задач.");
+        assertEquals(1, taskManager.getPrioritizedTasks().size(), "Неверное количество отсортированных по времени задач.");
     }
 
     @Test
@@ -97,6 +202,7 @@ abstract class TaskManagerTest <T extends TaskManager> {
         taskManager.saveTask(task);
         taskManager.clearAllTasks();
         assertEquals("{}", taskManager.getTaskTable().toString());
+        assertEquals(0, taskManager.getPrioritizedTasks().size(), "Неверное количество отсортированных по времени задач.");
     }
 
     @Test
@@ -146,7 +252,7 @@ abstract class TaskManagerTest <T extends TaskManager> {
     }
 
     @Test
-    public void updateStatusWhenEpicIsCreatedOrUpdated() throws InvalidValueException {
+    public void updateStatusWhenEpicIsCreatedOrUpdated() throws InvalidValueException, TimeIntersectionException {
         Epic epic = new Epic("Testing the Epic", "Epic description");
         taskManager.saveEpic(epic);
         final int epicId = epic.getTaskId();
@@ -162,7 +268,7 @@ abstract class TaskManagerTest <T extends TaskManager> {
     public void updateStatusWhenAEpicListIsEmpty() {
         Epic epic = new Epic("Test Epic", "Testing an update Epic");
         InvalidValueException ex = assertThrows(InvalidValueException.class, () -> taskManager.updateEpic(epic));
-        assertEquals("Данный эпик или не существует, или пересекается по времени с другими задачами", ex.getMessage());
+        assertEquals("Данного эпика не существует", ex.getMessage());
     }
 
     @Test
@@ -256,6 +362,7 @@ abstract class TaskManagerTest <T extends TaskManager> {
         assertEquals(1, taskManager.getSubtaskTable().size(), "Неверное количество подзадач.");
         assertEquals(subtask, taskManager.getSubtaskTable().get(subtaskId), "Подзадачи не совпадают.");
         assertEquals(subtaskId, epic.getEpicListId().get(0), "Подзадача не входит в список своего эпика.");
+        assertEquals(1, taskManager.getPrioritizedTasks().size(), "Неверное количество отсортированных по времени задач.");
     }
 
     @Test
@@ -270,11 +377,24 @@ abstract class TaskManagerTest <T extends TaskManager> {
         Subtask subtask = new Subtask("Testing the Subtask", "Test description", epic.getTaskId());
         taskManager.saveSubtask(subtask, epic, epic.getEpicListId());
         assertEquals(Status.NEW, subtask.getSubtaskStatus());
-        subtask = new Subtask("Testing the Subtask", "Testing an update Subtask - 1", epic.getTaskId());
+        LocalDateTime subtask1StartTime = LocalDateTime.of(2023, Month.DECEMBER, 3, 11, 11);
+        Duration subtask1Duration = Duration.ofHours(20);
+        subtask = new Subtask("Testing the Subtask", "Testing an update Subtask - 1", epic.getTaskId(),
+                subtask1StartTime, subtask1Duration);
         taskManager.updateSubtask(subtask);
         assertEquals(Status.IN_PROGRESS, subtask.getSubtaskStatus());
-        subtask = new Subtask("Testing the Subtask", "Testing an update Subtask - 2", epic.getTaskId());
+        assertEquals(subtask1StartTime, subtask.getTaskStartTime(), "Неверное время начала подзадачи");
+        assertEquals(subtask1Duration, subtask.getTaskDuration(), "Неверная продолжительность подзадачи");
+        assertEquals(subtask1StartTime, epic.getTaskStartTime(), "Неверное время начала у эпика");
+        assertEquals(subtask.getTaskEndTime(), epic.getTaskEndTime(), "Неверная продолжительность эпика");
+        LocalDateTime subtask2StartTime = LocalDateTime.of(2025, Month.MARCH, 6, 19, 22);
+        Duration subtask2Duration = Duration.ofHours(10);
+        subtask = new Subtask("Testing the Subtask", "Testing an update Subtask - 2", epic.getTaskId(), subtask2StartTime, subtask2Duration);
         taskManager.updateSubtask(subtask);
+        assertEquals(subtask2StartTime, subtask.getTaskStartTime(), "Неверное время начала подзадачи");
+        assertEquals(subtask2Duration, subtask.getTaskDuration(), "Неверная продолжительность подзадачи");
+        assertEquals(subtask1StartTime, epic.getTaskStartTime(), "Неверное время начала у эпика");
+        assertEquals(subtask.getTaskEndTime(), epic.getTaskEndTime(), "Неверная продолжительность эпика");
         assertEquals(Status.DONE, subtask.getSubtaskStatus());
     }
 
@@ -282,7 +402,7 @@ abstract class TaskManagerTest <T extends TaskManager> {
     public void updateStatusWhenASubtaskListIsEmpty() {
         Subtask subtask = new Subtask("Testing the Subtask", "Test description", 0);
         InvalidValueException ex = assertThrows(InvalidValueException.class, () -> taskManager.updateSubtask(subtask));
-        assertEquals("Данная подзадача или не существует, или пересекается по времени с другими задачами", ex.getMessage());
+        assertEquals("Данной подзадачи не существует", ex.getMessage());
 
     }
 
@@ -295,10 +415,11 @@ abstract class TaskManagerTest <T extends TaskManager> {
         final int id = subtaskOne.getTaskId();
         Subtask subtaskTwo = new Subtask("Testing the SubtaskTwo", "Test description - 2", epic.getTaskId());
         taskManager.saveSubtask(subtaskTwo, epic, epic.getEpicListId());
-        taskManager.clearByIdSubtasks(id);
+        taskManager.clearByIdSubtasks(subtaskOne.getTaskId());
         final Subtask savedSubtask = taskManager.getSubtaskTable().get(id);
         assertNull(savedSubtask, "Подзадача найдена.");
         assertEquals(1, taskManager.getSubtaskTable().size(), "Неверное количество подзадач.");
+        assertEquals(1, taskManager.getPrioritizedTasks().size(), "Неверное количество отсортированных по времени задач.");
     }
 
     @Test

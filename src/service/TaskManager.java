@@ -14,7 +14,7 @@ public interface TaskManager {
 
     void saveTask(Task task) throws TimeIntersectionException;
 
-    void updateTask(Task task) throws InvalidValueException;
+    void updateTask(Task task) throws InvalidValueException, TimeIntersectionException;
 
     void outputAllTasks() throws InvalidValueException;
 
@@ -26,7 +26,7 @@ public interface TaskManager {
 
     void saveEpic(Epic epic);
 
-    void updateEpic(Epic epic) throws InvalidValueException;
+    void updateEpic(Epic epic) throws InvalidValueException, TimeIntersectionException;
 
     void outputAllEpics() throws InvalidValueException;
 
@@ -38,7 +38,7 @@ public interface TaskManager {
 
     void saveSubtask(Subtask subtask, Epic epic, ArrayList<Integer> epicListId) throws TimeIntersectionException;
 
-    void updateSubtask(Subtask subtask) throws InvalidValueException;
+    void updateSubtask(Subtask subtask) throws InvalidValueException, TimeIntersectionException;
 
     void outputAllSubtasks() throws InvalidValueException;
 
