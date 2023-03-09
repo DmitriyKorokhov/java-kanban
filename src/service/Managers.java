@@ -1,8 +1,8 @@
 package service;
 
 public class Managers {
-
-    private static String file = "file.csv";
+    // название файла меняться не должно, добавил final
+    private final static String file = "file.csv";
 
     public static TaskManager getDefault() {
         return new InMemoryTaskManager();

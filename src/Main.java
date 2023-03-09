@@ -47,6 +47,7 @@ public class Main {
         Duration subtask3Duration = Duration.ofHours(2);
         Subtask subtaskOne3 = new Subtask(subtaskTitleOne3, subtaskSpecificationOne3, epicOne.getTaskId(), subtask3StartTime, subtask3Duration);
 
+        // исправил ошибку, когда время начала или конца подзадачи при обновлении некорректно обновлялись у эпика
         System.out.println("Добавление задачи 1");
         fileBackedTasksManager.saveTask(taskOne);
         System.out.println("Добавление задачи 2");
@@ -58,46 +59,20 @@ public class Main {
         System.out.println("Добавление подзадачи 1 для 1 эпика");
         fileBackedTasksManager.saveSubtask(subtaskOne1, epicOne, epicOne.getEpicListId());
         System.out.println("Добавление подзадачи 2 для 1 эпика");
-        try {
-            fileBackedTasksManager.saveSubtask(subtaskOne2, epicOne, epicOne.getEpicListId());
-        } catch (TimeIntersectionException e) {
-            System.out.println(e.getMessage());
-        }
         System.out.println("Добавление подзадачи 3 для 1 эпика");
         fileBackedTasksManager.saveSubtask(subtaskOne3, epicOne, epicOne.getEpicListId());
-        System.out.println("Отсортированные по времени задачи");
         System.out.println(fileBackedTasksManager.getPrioritizedTasks());
         LocalDateTime newTaskStartTimeOne = LocalDateTime.of(2035, Month.NOVEMBER, 1, 21, 10);;
         Duration newTaskDurationOne = Duration.ofDays(1);
         taskOne = new Task(taskTitleOne, taskSpecificationOne, newTaskStartTimeOne, newTaskDurationOne);
         System.out.println("Обновление задачи 1");
         fileBackedTasksManager.updateTask(taskOne);
-        System.out.println("Отсортированные по времени задачи");
-        System.out.println(fileBackedTasksManager.getPrioritizedTasks());
-        System.out.println("удаление эпика с id = 3");
-        fileBackedTasksManager.clearByIdEpic(3);
-        System.out.println("удаление эпика с id = 3");
-        try {
-            fileBackedTasksManager.clearByIdEpic(3);
-        } catch (InvalidValueException e) {
-            System.out.println(e.getMessage());
-        }
         System.out.println("Вывод всех задач");
         fileBackedTasksManager.outputAllTasks();
         System.out.println("Вывод всех эпиков");
         fileBackedTasksManager.outputAllEpics();
         System.out.println("Вывод всех подзадач");
         fileBackedTasksManager.outputAllSubtasks();
-        System.out.println("Отсортированные по времени задачи");
-        System.out.println(fileBackedTasksManager.getPrioritizedTasks());
-        System.out.println("Удаляю задачу с id = 1");
-        fileBackedTasksManager.clearByIdTask(1);
-        System.out.println("Вывод всех задач");
-        fileBackedTasksManager.outputAllTasks();
-        System.out.println("Вывод подзадачи с id = 5");
-        fileBackedTasksManager.outputByIdSubtasks(5);
-        System.out.println("Вывод эпика с id = 2");
-        fileBackedTasksManager.outputByIdEpic(2);
         LocalDateTime newTaskStartTime3 = LocalDateTime.of(2047, Month.APRIL, 5, 21, 19);;
         Duration newTaskDuration3 = Duration.ofDays(1);
         String newSubtaskTitleOne3 = "Сбор коробок";
@@ -121,7 +96,7 @@ public class Main {
         }
         System.out.println("Отсортированные по времени задачи");
         System.out.println(fileBackedTasksManager.getPrioritizedTasks());
-/*
+
         FileBackedTasksManager newFileBackedTasksManager = fileBackedTasksManager.loadFromFile("file.csv");
         System.out.println("Вывод всех задач");
         newFileBackedTasksManager.outputAllTasks();
@@ -135,6 +110,5 @@ public class Main {
         }
         System.out.println("Вывод истории");
         System.out.println(newFileBackedTasksManager.getHistory());
-*/
     }
 }

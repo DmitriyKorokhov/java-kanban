@@ -116,20 +116,5 @@ public class Task {
                     ;
         }
     }
- /*
-    @Override
-    public int compareTo(Task o) {
-        return LocalDateTime.compare(this.getTaskStartTime(), o.getTaskStartTime());
-    }
-
-                if (task1.getTaskStartTime() != null && task2.getTaskStartTime() != null) {
-                return task1.getTaskStartTime().compareTo(task2.getTaskStartTime());
-            } else if (task1.getTaskStartTime() == null && task2.getTaskStartTime() != null) {
-                return 1;
-            } else {
-                return -1;
-            }
-        }
-     */
 }
 

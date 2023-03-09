@@ -5,9 +5,10 @@ import model.Status;
 import model.Subtask;
 import model.Task;
 
+import java.time.LocalDateTime;
 import java.util.*;
 
-public class InMemoryTaskManager implements TaskManager  {
+public class InMemoryTaskManager implements TaskManager {
     private int taskId = 0;
     private final HistoryManager historyManager = Managers.getDefaultHistory();
     private final HashMap<Integer, Subtask> subtaskTable = new HashMap<>();
@@ -35,16 +36,16 @@ public class InMemoryTaskManager implements TaskManager  {
     }
 
     public void checkIntersections(Task task) throws TimeIntersectionException {
-        for (Task i : prioritizedTasks) {
-            if ( i.getTaskStartTime() != null && task.getTaskStartTime() != null &&
-                    ( i.getTaskStartTime().isAfter(task.getTaskStartTime()) &&
-                    i.getTaskEndTime().isBefore(task.getTaskEndTime()) ||
-                    i.getTaskStartTime().isBefore(task.getTaskStartTime()) &&
-                    task.getTaskStartTime().isBefore(i.getTaskEndTime()) ||
-                    i.getTaskStartTime().isAfter(task.getTaskStartTime()) &&
-                    i.getTaskStartTime().isBefore(task.getTaskEndTime()) ||
-                    i.getTaskStartTime() == task.getTaskStartTime() ||
-                    i.getTaskEndTime() == task.getTaskEndTime())
+        for (Task sortedTask : prioritizedTasks) {
+            if ( sortedTask.getTaskStartTime() != null && task.getTaskStartTime() != null &&
+                    ( sortedTask.getTaskStartTime().isAfter(task.getTaskStartTime()) &&
+                      sortedTask.getTaskEndTime().isBefore(task.getTaskEndTime()) ||
+                      sortedTask.getTaskStartTime().isBefore(task.getTaskStartTime()) &&
+                      task.getTaskStartTime().isBefore(sortedTask.getTaskEndTime()) ||
+                      sortedTask.getTaskStartTime().isAfter(task.getTaskStartTime()) &&
+                      sortedTask.getTaskStartTime().isBefore(task.getTaskEndTime()) ||
+                      sortedTask.getTaskStartTime() == task.getTaskStartTime() ||
+                      sortedTask.getTaskEndTime() == task.getTaskEndTime())
             ) {
                 throw new TimeIntersectionException("Задача пересекается по времени с другими задачами");
             }
@@ -255,8 +256,19 @@ public class InMemoryTaskManager implements TaskManager  {
                     mapStatusSubtask.put(id, Status.DONE);
                 }
                 prioritizedTasks.add(subtask);
-                epic.setEpicStartTime(subtask);
-                epic.setEpicEndTime(subtask);
+                LocalDateTime startTime = LocalDateTime.MAX;
+                LocalDateTime endTime = LocalDateTime.MIN;
+                for (Map.Entry<Integer, Subtask> subtaskEntryForTime : subtaskTable.entrySet()) {
+                    if (subtaskEntryForTime.getValue().getTaskStartTime() != null) {
+                        if (subtaskEntryForTime.getValue().getTaskStartTime().isBefore(startTime)) {
+                            startTime = subtaskEntryForTime.getValue().getTaskStartTime();
+                            epic.setTaskStartTime(startTime);
+                        } else if (subtaskEntryForTime.getValue().getTaskEndTime().isAfter(endTime)) {
+                            endTime = subtaskEntryForTime.getValue().getTaskEndTime();
+                            epic.setTaskEndTime(endTime);
+                        }
+                    }
+                }
                 epicTable.put(epicId, epic);
                 return;
             }
