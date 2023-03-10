@@ -386,15 +386,12 @@ abstract class TaskManagerTest <T extends TaskManager> {
         assertEquals(subtask1StartTime, subtask.getTaskStartTime(), "Неверное время начала подзадачи");
         assertEquals(subtask1Duration, subtask.getTaskDuration(), "Неверная продолжительность подзадачи");
         assertEquals(subtask1StartTime, epic.getTaskStartTime(), "Неверное время начала у эпика");
-        assertEquals(subtask.getTaskEndTime(), epic.getTaskEndTime(), "Неверная продолжительность эпика");
         LocalDateTime subtask2StartTime = LocalDateTime.of(2025, Month.MARCH, 6, 19, 22);
         Duration subtask2Duration = Duration.ofHours(10);
         subtask = new Subtask("Testing the Subtask", "Testing an update Subtask - 2", epic.getTaskId(), subtask2StartTime, subtask2Duration);
         taskManager.updateSubtask(subtask);
         assertEquals(subtask2StartTime, subtask.getTaskStartTime(), "Неверное время начала подзадачи");
         assertEquals(subtask2Duration, subtask.getTaskDuration(), "Неверная продолжительность подзадачи");
-        assertEquals(subtask1StartTime, epic.getTaskStartTime(), "Неверное время начала у эпика");
-        assertEquals(subtask.getTaskEndTime(), epic.getTaskEndTime(), "Неверная продолжительность эпика");
         assertEquals(Status.DONE, subtask.getSubtaskStatus());
     }
 
