@@ -263,7 +263,8 @@ public class InMemoryTaskManager implements TaskManager {
                         if (subtaskEntryForTime.getValue().getTaskStartTime().isBefore(startTime)) {
                             startTime = subtaskEntryForTime.getValue().getTaskStartTime();
                             epic.setTaskStartTime(startTime);
-                        } else if (subtaskEntryForTime.getValue().getTaskEndTime().isAfter(endTime)) {
+                        }
+                        if (subtaskEntryForTime.getValue().getTaskEndTime().isAfter(endTime)) {
                             endTime = subtaskEntryForTime.getValue().getTaskEndTime();
                             epic.setTaskEndTime(endTime);
                         }

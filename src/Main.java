@@ -1,4 +1,5 @@
 import model.Epic;
+import model.Status;
 import model.Subtask;
 import model.Task;
 import service.*;
@@ -7,10 +8,12 @@ import java.time.LocalDateTime;
 import java.time.Duration;
 import java.time.Month;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
+
 public class Main {
     public static void main(String[] args) throws TimeIntersectionException, InvalidValueException {
         FileBackedTasksManager fileBackedTasksManager = Managers.getDefaultFileBackedTasksManager();
-
+/*
         String taskTitleOne = "Переезд 1";
         String taskSpecificationOne = "Я переезжаю в новую квартиру";
         LocalDateTime taskStartTimeOne = LocalDateTime.now();
@@ -47,7 +50,40 @@ public class Main {
         Duration subtask3Duration = Duration.ofHours(2);
         Subtask subtaskOne3 = new Subtask(subtaskTitleOne3, subtaskSpecificationOne3, epicOne.getTaskId(), subtask3StartTime, subtask3Duration);
 
+
+ */
         // исправил ошибку, когда время начала или конца подзадачи при обновлении некорректно обновлялись у эпика
+        System.out.println("Добавление эпика 1");
+        Epic epic = new Epic("Epic", "Test description");
+        fileBackedTasksManager.saveEpic(epic);
+        System.out.println("Добавление подзадачи 1 для 1 эпика");
+        Subtask subtask = new Subtask("Testing the Subtask", "Test description", epic.getTaskId());
+        fileBackedTasksManager.saveSubtask(subtask, epic, epic.getEpicListId());
+        System.out.println("Вывод всех подзадач");
+        fileBackedTasksManager.outputAllSubtasks();
+        System.out.println("Вывод всех эпиков");
+        fileBackedTasksManager.outputAllEpics();
+        System.out.println("Обновление subtask 1");
+        LocalDateTime subtask1StartTime = LocalDateTime.of(2023, Month.DECEMBER, 3, 11, 11);
+        Duration subtask1Duration = Duration.ofHours(20);
+        subtask = new Subtask("Testing the Subtask", "Testing an update Subtask - 1", epic.getTaskId(),
+                subtask1StartTime, subtask1Duration);
+        fileBackedTasksManager.updateSubtask(subtask);
+        System.out.println("Вывод всех подзадач");
+        fileBackedTasksManager.outputAllSubtasks();
+        System.out.println("Вывод всех эпиков");
+        fileBackedTasksManager.outputAllEpics();
+        System.out.println("Обновление subtask 1 - 2");
+        LocalDateTime subtask2StartTime = LocalDateTime.of(2025, Month.MARCH, 6, 19, 22);
+        Duration subtask2Duration = Duration.ofHours(10);
+        subtask = new Subtask("Testing the Subtask", "Testing an update Subtask - 2", epic.getTaskId(), subtask2StartTime, subtask2Duration);
+        fileBackedTasksManager.updateSubtask(subtask);
+        System.out.println("Вывод всех подзадач");
+        fileBackedTasksManager.outputAllSubtasks();
+        System.out.println("Вывод всех эпиков");
+        fileBackedTasksManager.outputAllEpics();
+
+        /*
         System.out.println("Добавление задачи 1");
         fileBackedTasksManager.saveTask(taskOne);
         System.out.println("Добавление задачи 2");
@@ -110,5 +146,7 @@ public class Main {
         }
         System.out.println("Вывод истории");
         System.out.println(newFileBackedTasksManager.getHistory());
+
+         */
     }
 }
