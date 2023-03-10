@@ -9,16 +9,12 @@ public class Epic extends Task{
     private TypesOfTasks epicType;
     private LocalDateTime epicStartTime;
     private LocalDateTime epicEndTime;
-    private LocalDateTime MAX;
-    private LocalDateTime MIN;
 
     public Epic(String taskTitle, String taskSpecification) {
         super(taskTitle, taskSpecification);
         epicListId = new ArrayList<>();
         epicStatus = Status.NEW;
         epicType = TypesOfTasks.EPIC;
-        MAX = LocalDateTime.MAX;
-        MIN = LocalDateTime.MIN;
     }
 
     @Override
@@ -54,41 +50,6 @@ public class Epic extends Task{
         super.setTaskDuration(taskDuration);
     }
 
-    public void setEpicStartTime(Subtask subtask) {
-        MAX = getStartTime();
-        if (subtask.getTaskStartTime() != null) {
-            if (MAX.isAfter(subtask.getTaskStartTime())) {
-                setStartTime(subtask.getTaskStartTime());
-            }
-        }
-        epicStartTime = getStartTime();
-    }
-
-    public LocalDateTime getStartTime() {
-        return MAX;
-    }
-
-    public void setStartTime(LocalDateTime startTime) {
-        this.MAX = startTime;
-    }
-
-    public void setEpicEndTime(Subtask subtask) {
-        MIN = getEndTime();
-        if (subtask.getTaskEndTime() != null) {
-            if (MIN.isBefore(subtask.getTaskEndTime())) {
-                setEndTime(subtask.getTaskEndTime());
-            }
-        }
-        epicEndTime = getEndTime();
-    }
-
-    public LocalDateTime getEndTime() {
-        return MIN;
-    }
-
-    public void setEndTime (LocalDateTime MIN) {
-        this.MIN = MIN;
-    }
 
     public void setEpicType(TypesOfTasks epicType) {
         this.epicType = epicType;

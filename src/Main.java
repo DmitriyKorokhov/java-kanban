@@ -1,5 +1,4 @@
 import model.Epic;
-import model.Status;
 import model.Subtask;
 import model.Task;
 import service.*;
@@ -48,7 +47,7 @@ public class Main {
         Duration subtask3Duration = Duration.ofHours(2);
         Subtask subtaskOne3 = new Subtask(subtaskTitleOne3, subtaskSpecificationOne3, epicOne.getTaskId(), subtask3StartTime, subtask3Duration);
 
-        // исправил ошибку, когда время начала или конца подзадачи при обновлении некорректно обновлялись у эпика
+        // исправил 2 ошибки, когда время начала или конца подзадачи при обновлении некорректно обновлялись у эпика + пересечение по времени
         System.out.println("Добавление задачи 1");
         fileBackedTasksManager.saveTask(taskOne);
         System.out.println("Добавление задачи 2");
@@ -59,11 +58,10 @@ public class Main {
         fileBackedTasksManager.saveEpic(epicTwo);
         System.out.println("Добавление подзадачи 1 для 1 эпика");
         fileBackedTasksManager.saveSubtask(subtaskOne1, epicOne, epicOne.getEpicListId());
-        System.out.println("Добавление подзадачи 2 для 1 эпика");
         System.out.println("Добавление подзадачи 3 для 1 эпика");
         fileBackedTasksManager.saveSubtask(subtaskOne3, epicOne, epicOne.getEpicListId());
         System.out.println(fileBackedTasksManager.getPrioritizedTasks());
-        LocalDateTime newTaskStartTimeOne = LocalDateTime.of(2035, Month.NOVEMBER, 1, 21, 10);;
+        LocalDateTime newTaskStartTimeOne = LocalDateTime.of(2035, Month.NOVEMBER, 1, 21, 10);
         Duration newTaskDurationOne = Duration.ofDays(1);
         taskOne = new Task(taskTitleOne, taskSpecificationOne, newTaskStartTimeOne, newTaskDurationOne);
         System.out.println("Обновление задачи 1");
@@ -74,7 +72,7 @@ public class Main {
         fileBackedTasksManager.outputAllEpics();
         System.out.println("Вывод всех подзадач");
         fileBackedTasksManager.outputAllSubtasks();
-        LocalDateTime newTaskStartTime3 = LocalDateTime.of(2047, Month.APRIL, 5, 21, 19);;
+        LocalDateTime newTaskStartTime3 = LocalDateTime.of(2047, Month.APRIL, 5, 21, 19);
         Duration newTaskDuration3 = Duration.ofDays(1);
         String newSubtaskTitleOne3 = "Сбор коробок";
         String newSubtaskSpecificationOne3 = "Собранные коробки нужно загрузить в машину";
@@ -89,12 +87,36 @@ public class Main {
         System.out.println(fileBackedTasksManager.getPrioritizedTasks());
         System.out.println("Удаление всех подзадач");
         fileBackedTasksManager.clearAllSubtasks();
-        System.out.println("Вывод всех подзадач");
         try {
             fileBackedTasksManager.outputAllSubtasks();
         } catch (InvalidValueException e) {
             System.out.println(e.getMessage());
         }
+        System.out.println("Отсортированные по времени задачи");
+        System.out.println(fileBackedTasksManager.getPrioritizedTasks());
+        System.out.println("Добавление подзадачи 4 для 1 эпика");
+        Subtask subtaskOne4 = new Subtask("subtaskTitleOne4", "subtaskSpecificationOne4", epicOne.getTaskId(),
+                LocalDateTime.of(2023, Month.APRIL, 5, 21, 19), Duration.ofHours(10));
+        fileBackedTasksManager.saveSubtask(subtaskOne4, epicOne, epicOne.getEpicListId());
+        System.out.println("Добавление подзадачи 5 для 1 эпика");
+        try {
+            Subtask subtaskOne5 = new Subtask("subtaskTitleOne2", "subtaskSpecificationOne2", epicTwo.getTaskId(),
+                    LocalDateTime.of(2023, Month.APRIL, 5, 21, 19), Duration.ofHours(10));
+            fileBackedTasksManager.saveSubtask(subtaskOne5, epicTwo, epicTwo.getEpicListId());
+        } catch (TimeIntersectionException e) {
+            System.out.println(e.getMessage());
+        }
+        try {
+            Task task0 = new Task("subtaskTitleOne2", "subtaskSpecificationOne2",
+                    LocalDateTime.of(2023, Month.APRIL, 5, 21, 19), Duration.ofHours(10));
+            fileBackedTasksManager.saveTask(task0);
+        } catch (TimeIntersectionException e) {
+            System.out.println(e.getMessage());
+        }
+        System.out.println("Вывод всех подзадач");
+        fileBackedTasksManager.outputAllSubtasks();
+        System.out.println("Вывод всех эпиков");
+        fileBackedTasksManager.outputAllEpics();
         System.out.println("Отсортированные по времени задачи");
         System.out.println(fileBackedTasksManager.getPrioritizedTasks());
 

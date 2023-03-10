@@ -44,8 +44,8 @@ public class InMemoryTaskManager implements TaskManager {
                       task.getTaskStartTime().isBefore(sortedTask.getTaskEndTime()) ||
                       sortedTask.getTaskStartTime().isAfter(task.getTaskStartTime()) &&
                       sortedTask.getTaskStartTime().isBefore(task.getTaskEndTime()) ||
-                      sortedTask.getTaskStartTime() == task.getTaskStartTime() ||
-                      sortedTask.getTaskEndTime() == task.getTaskEndTime())
+                      sortedTask.getTaskStartTime().equals(task.getTaskStartTime() )||
+                      sortedTask.getTaskEndTime().equals(task.getTaskEndTime()) )
             ) {
                 throw new TimeIntersectionException("Задача пересекается по времени с другими задачами");
             }
@@ -63,10 +63,15 @@ public class InMemoryTaskManager implements TaskManager {
 
     @Override
     public void updateTask(Task task) throws InvalidValueException, TimeIntersectionException {
-        checkIntersections(task);
         for (Map.Entry<Integer, Task> taskEntry : taskTable.entrySet()) {
             if (taskEntry.getValue().getTaskTitle().equals(task.getTaskTitle())) {
                 int id = taskEntry.getKey();
+                if (taskEntry.getValue().getTaskStartTime() != null && task.getTaskStartTime() != null &&
+                    (!taskEntry.getValue().getTaskStartTime().equals(task.getTaskStartTime()) ||
+                    !taskEntry.getValue().getTaskEndTime().equals(task.getTaskEndTime()))
+                    ) {
+                    checkIntersections(task);
+                }
                 prioritizedTasks.remove(taskTable.get(id));
                 task.setTaskStatus(taskEntry.getValue().getTaskStatus());
                 task.setTaskId(id);
@@ -222,8 +227,20 @@ public class InMemoryTaskManager implements TaskManager {
         epic.setEpicListId(epicListId);
         subtaskTable.put(subtask.getTaskId(), subtask);
         subtask.setIdEpic(epic.getTaskId());
-        epic.setEpicStartTime(subtask);
-        epic.setEpicEndTime(subtask);
+        LocalDateTime startTime = LocalDateTime.MAX;
+        LocalDateTime endTime = LocalDateTime.MIN;
+        for (Map.Entry<Integer, Subtask> subtaskEntryForTime : subtaskTable.entrySet()) {
+            if (subtaskEntryForTime.getValue().getTaskStartTime() != null) {
+                if (subtaskEntryForTime.getValue().getTaskStartTime().isBefore(startTime)) {
+                    startTime = subtaskEntryForTime.getValue().getTaskStartTime();
+                    epic.setTaskStartTime(startTime);
+                }
+                if (subtaskEntryForTime.getValue().getTaskEndTime().isAfter(endTime)) {
+                    endTime = subtaskEntryForTime.getValue().getTaskEndTime();
+                    epic.setTaskEndTime(endTime);
+                }
+            }
+        }
         prioritizedTasks.add(subtask);
         this.taskId++;
     }
@@ -231,10 +248,15 @@ public class InMemoryTaskManager implements TaskManager {
     @Override
     public void updateSubtask(Subtask subtask) throws InvalidValueException, TimeIntersectionException {
         int epicId = 0;
-        checkIntersections(subtask);
         for (Map.Entry<Integer, Subtask> subtaskEntry : subtaskTable.entrySet()) {
             if (subtaskEntry.getValue().getTaskTitle().equals(subtask.getTaskTitle())) {
                 int id = subtaskEntry.getKey();
+                if (subtaskEntry.getValue().getTaskStartTime() != null && subtask.getTaskStartTime() != null &&
+                    (!subtaskEntry.getValue().getTaskStartTime().equals(subtask.getTaskStartTime()) ||
+                    !subtaskEntry.getValue().getTaskEndTime().equals(subtask.getTaskEndTime()))
+                    ) {
+                    checkIntersections(subtask);
+                }
                 prioritizedTasks.remove(subtaskTable.get(id));
                 for (Map.Entry<Integer, ArrayList<Integer>> entry : mapIdSubtaskByEpic.entrySet()) {
                     ArrayList<Integer> subtasksListId = entry.getValue();

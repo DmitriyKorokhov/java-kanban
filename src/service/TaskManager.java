@@ -11,9 +11,6 @@ import java.util.Set;
 
 public interface TaskManager {
     Set<Task> getPrioritizedTasks();
-    /* В методах я пробрасываю исключения с помощью throws, а обработку веду в блоке try catch в классе Main, поэтому
-       прописываю проброс исключения у методов. Так я реализовал исключения
-     */
     void saveTask(Task task) throws TimeIntersectionException;
 
     void updateTask(Task task) throws InvalidValueException, TimeIntersectionException;
