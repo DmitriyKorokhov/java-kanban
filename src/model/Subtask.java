@@ -23,6 +23,16 @@ public class Subtask extends Task{
         setTaskEndTime(taskStartTime.plus(taskDuration));
     }
 
+    public Subtask(int taskId, String taskTitle, String taskSpecification, LocalDateTime taskStartTime, Duration taskDuration) {
+        super(taskId, taskTitle, taskSpecification, taskStartTime, taskDuration);
+        subtaskType = TypesOfTasks.SUBTASK;
+    }
+
+    public Subtask(int taskId, String taskTitle, String taskSpecification) {
+        super(taskId, taskTitle, taskSpecification);
+        subtaskType = TypesOfTasks.SUBTASK;
+    }
+
     @Override
     public LocalDateTime getTaskStartTime() {
         return super.getTaskStartTime();

@@ -17,6 +17,11 @@ public class Epic extends Task{
         epicType = TypesOfTasks.EPIC;
     }
 
+    public Epic(int taskId, String taskTitle, String taskSpecification) {
+        super(taskId, taskTitle, taskSpecification);
+        epicType = TypesOfTasks.EPIC;
+    }
+
     @Override
     public LocalDateTime getTaskStartTime() {
         return epicStartTime;

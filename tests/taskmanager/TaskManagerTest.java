@@ -379,7 +379,7 @@ abstract class TaskManagerTest <T extends TaskManager> {
         assertEquals(Status.NEW, subtask.getSubtaskStatus());
         LocalDateTime subtask1StartTime = LocalDateTime.of(2023, Month.DECEMBER, 3, 11, 11);
         Duration subtask1Duration = Duration.ofHours(20);
-        subtask = new Subtask("Testing the Subtask", "Testing an update Subtask - 1", epic.getTaskId(),
+        subtask = new Subtask(1, "Testing the Subtask", "Testing an update Subtask - 1",
                 subtask1StartTime, subtask1Duration);
         taskManager.updateSubtask(subtask);
         assertEquals(Status.IN_PROGRESS, subtask.getSubtaskStatus());
@@ -389,7 +389,7 @@ abstract class TaskManagerTest <T extends TaskManager> {
         assertEquals(subtask.getTaskEndTime(), epic.getTaskEndTime(), "Неверная продолжительность эпика");
         LocalDateTime subtask2StartTime = LocalDateTime.of(2025, Month.MARCH, 6, 19, 22);
         Duration subtask2Duration = Duration.ofHours(10);
-        subtask = new Subtask("Testing the Subtask", "Testing an update Subtask - 2", epic.getTaskId(), subtask2StartTime, subtask2Duration);
+        subtask = new Subtask(1, "Testing the Subtask", "Testing an update Subtask - 2", subtask2StartTime, subtask2Duration);
         taskManager.updateSubtask(subtask);
         assertEquals(subtask2StartTime, subtask.getTaskStartTime(), "Неверное время начала подзадачи");
         assertEquals(subtask2Duration, subtask.getTaskDuration(), "Неверная продолжительность подзадачи");
@@ -517,12 +517,13 @@ abstract class TaskManagerTest <T extends TaskManager> {
         taskManager.saveEpic(epic);
         Subtask subtask = new Subtask("Testing the Subtask", "Test description", epic.getTaskId());
         taskManager.saveSubtask(subtask, epic, epic.getEpicListId());
+        int subtaskId = subtask.getTaskId();
         assertEquals(Status.NEW, epic.getEpicStatus(), "Неверный статус у эпика");
-        subtask = new Subtask("Testing the Subtask", "Test description - 1", epic.getTaskId());
+        subtask = new Subtask(subtaskId, "Testing the Subtask", "Test description - 1");
         taskManager.updateSubtask(subtask);
         taskManager.epicStatus(epic, epic.getEpicListId());
         assertEquals(Status.IN_PROGRESS, epic.getEpicStatus());
-        subtask = new Subtask("Testing the Subtask", "Test description - 2", epic.getTaskId());
+        subtask = new Subtask(subtaskId, "Testing the Subtask", "Test description - 2");
         taskManager.updateSubtask(subtask);
         taskManager.epicStatus(epic, epic.getEpicListId());
         assertEquals(Status.DONE, epic.getEpicStatus());
