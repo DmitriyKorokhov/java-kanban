@@ -22,6 +22,18 @@ public class Epic extends Task{
         epicType = TypesOfTasks.EPIC;
     }
 
+    public Epic(String taskTitle, String taskSpecification, TypesOfTasks epicType) {
+        super(taskTitle, taskSpecification);
+        epicListId = new ArrayList<>();
+        epicStatus = Status.NEW;
+        this.epicType = epicType;
+    }
+
+    public Epic(int taskId, String taskTitle, String taskSpecification, TypesOfTasks epicType) {
+        super(taskId, taskTitle, taskSpecification);
+        this.epicType = epicType;
+    }
+
     @Override
     public LocalDateTime getTaskStartTime() {
         return epicStartTime;
@@ -56,11 +68,11 @@ public class Epic extends Task{
     }
 
 
-    public void setEpicType(TypesOfTasks epicType) {
-        this.epicType = epicType;
+    public void setType(TypesOfTasks type) {
+        this.epicType = type;
     }
 
-    public TypesOfTasks getEpicType() {
+    public TypesOfTasks getType() {
         return epicType;
     }
 

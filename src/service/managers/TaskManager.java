@@ -1,13 +1,12 @@
-package service;
+package service.managers;
 
 import model.Epic;
 import model.Subtask;
 import model.Task;
+import service.exception.InvalidValueException;
+import service.exception.TimeIntersectionException;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 
 public interface TaskManager {
     Set<Task> getPrioritizedTasks();
@@ -35,7 +34,7 @@ public interface TaskManager {
 
     void clearByIdEpic(Integer id) throws InvalidValueException;
 
-    void saveSubtask(Subtask subtask, Epic epic, ArrayList<Integer> epicListId) throws TimeIntersectionException;
+    void saveSubtask(Subtask subtask, int epicId) throws TimeIntersectionException;
 
     void updateSubtask(Subtask subtask) throws InvalidValueException, TimeIntersectionException;
 
@@ -64,4 +63,12 @@ public interface TaskManager {
     ArrayList<Integer> getListOfTasksIdForHistory();
 
     HistoryManager getHistoryManager();
+
+    Collection<Task> getListTasks();
+
+    Collection<Epic> getListEpics();
+
+    Collection<Subtask> getListSubtasks();
+
+    List<Subtask> getSubTasksByEpicId(int id) throws InvalidValueException;
 }

@@ -1,4 +1,4 @@
-package service;
+package service.exception;
 
 public class InvalidValueException extends Exception {
 

@@ -2,7 +2,11 @@ package historymanger;
 
 import model.Task;
 import org.junit.jupiter.api.Test;
-import service.*;
+import service.exception.InvalidValueException;
+import service.exception.TimeIntersectionException;
+import service.managers.HistoryManager;
+import service.managers.Managers;
+import service.managers.TaskManager;
 
 import java.util.List;
 
@@ -10,7 +14,7 @@ import static org.junit.jupiter.api.Assertions.*;
 
 class HistoryManagerTest {
     private final HistoryManager historyManager = Managers.getDefaultHistory();
-    private final TaskManager taskManager = Managers.getDefault();
+    private final TaskManager taskManager = Managers.getDefaultFileBackedTasksManager();
 
     @Test
     public void addTaskToTheHistory() throws InvalidValueException {

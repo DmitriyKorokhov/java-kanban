@@ -1,6 +1,9 @@
-package service;
+package service.managers;
 
 import model.*;
+import service.exception.InvalidValueException;
+import service.exception.ManagerSaveException;
+import service.exception.TimeIntersectionException;
 
 import java.io.BufferedWriter;
 import java.io.FileWriter;
@@ -9,21 +12,14 @@ import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.time.*;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 
-public class FileBackedTasksManager extends InMemoryTaskManager implements TaskManager{
-    private final String file;
-
-    public FileBackedTasksManager(String file) {
-        this.file = file;
-    }
+public class FileBackedTasksManager extends InMemoryTaskManager implements TaskManager {
+    private final String file = "file.csv";
 
     public static FileBackedTasksManager loadFromFile(String file){
         try {
-            FileBackedTasksManager fileBackedTasksManager = new FileBackedTasksManager(file);
+            FileBackedTasksManager fileBackedTasksManager = new FileBackedTasksManager();
             fileBackedTasksManager.fromString(file);
             fileBackedTasksManager.historyFromString(file);
             return fileBackedTasksManager;
@@ -75,17 +71,20 @@ public class FileBackedTasksManager extends InMemoryTaskManager implements TaskM
                     task.setTaskId(Integer.parseInt(parts[0]));
                     task.setTaskStatus(Status.valueOf(parts[3]));
                     getTaskTable().put(Integer.parseInt(parts[0]), task);
+                    getPrioritizedTasks().add(task);
                 } else if (parts[1].equals("TASK") && !parts[5].equals("indefinitely")) {
                     Task task = new Task(parts[2], parts[4], LocalDateTime.parse(parts[5]), Duration.parse(parts[6]));
                     task.setTaskId(Integer.parseInt(parts[0]));
                     task.setTaskStatus(Status.valueOf(parts[3]));
                     task.setTaskEndTime(LocalDateTime.parse(parts[7]));
                     getTaskTable().put(Integer.parseInt(parts[0]), task);
+                    getPrioritizedTasks().add(task);
                 } else if (parts[1].equals("EPIC") && parts[5].equals("indefinitely")) {
                     Epic epic = new Epic(parts[2], parts[4]);
                     epic.setTaskId(Integer.parseInt(parts[0]));
                     epic.setEpicStatus(Status.valueOf(parts[3]));
                     getEpicTable().put(Integer.parseInt(parts[0]), epic);
+                    getPrioritizedTasks().add(epic);
                 } else if (parts[1].equals("EPIC") && !parts[5].equals("indefinitely")) {
                     Epic epic = new Epic(parts[2], parts[4]);
                     epic.setTaskId(Integer.parseInt(parts[0]));
@@ -93,17 +92,20 @@ public class FileBackedTasksManager extends InMemoryTaskManager implements TaskM
                     epic.setTaskStartTime(LocalDateTime.parse(parts[5]));
                     epic.setTaskEndTime(LocalDateTime.parse(parts[7]));
                     getEpicTable().put(Integer.parseInt(parts[0]), epic);
+                    getPrioritizedTasks().add(epic);
                 } else if (parts[1].equals("SUBTASK") && parts[6].equals("indefinitely")) {
                     Subtask subtask = new Subtask(parts[2], parts[4], Integer.parseInt(parts[5]));
                     subtask.setTaskId(Integer.parseInt(parts[0]));
                     subtask.setSubtaskStatus(Status.valueOf(parts[3]));
                     getSubtaskTable().put(Integer.parseInt(parts[0]), subtask);
+                    getPrioritizedTasks().add(subtask);
                 } else if (parts[1].equals("SUBTASK") && !parts[6].equals("indefinitely")){
                     Subtask subtask = new Subtask(parts[2], parts[4],
                             Integer.parseInt(parts[5]), LocalDateTime.parse(parts[6]), Duration.parse(parts[7]));
                     subtask.setTaskId(Integer.parseInt(parts[0]));
                     subtask.setSubtaskStatus(Status.valueOf(parts[3]));
                     getSubtaskTable().put(Integer.parseInt(parts[0]), subtask);
+                    getPrioritizedTasks().add(subtask);
                 }
             } else {
                 break;
@@ -222,14 +224,29 @@ public class FileBackedTasksManager extends InMemoryTaskManager implements TaskM
     }
 
     @Override
+    public Collection<Task> getListTasks() {
+        return super.getListTasks();
+    }
+
+    @Override
+    public Collection<Epic> getListEpics() {
+        return super.getListEpics();
+    }
+
+    @Override
+    public Collection<Subtask> getListSubtasks() {
+        return super.getListSubtasks();
+    }
+
+    @Override
     public void clearByIdEpic(Integer id) throws InvalidValueException {
         super.clearByIdEpic(id);
         save();
     }
 
     @Override
-    public void saveSubtask(Subtask subtask, Epic epic, ArrayList<Integer> epicListId) throws TimeIntersectionException {
-        super.saveSubtask(subtask, epic, epicListId);
+    public void saveSubtask(Subtask subtask, int epicId) throws TimeIntersectionException {
+        super.saveSubtask(subtask, epicId);
         save();
     }
 
@@ -275,6 +292,11 @@ public class FileBackedTasksManager extends InMemoryTaskManager implements TaskM
     @Override
     public void removeHistoryById(int id) {
         super.removeHistoryById(id);
+    }
+
+    @Override
+    public List<Subtask> getSubTasksByEpicId(int id) throws InvalidValueException {
+        return super.getSubTasksByEpicId(id);
     }
 
     @Override

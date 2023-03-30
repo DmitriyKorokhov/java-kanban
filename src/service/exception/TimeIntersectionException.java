@@ -1,4 +1,4 @@
-package service;
+package service.exception;
 
 public class TimeIntersectionException extends Exception{
     public TimeIntersectionException(String message) {

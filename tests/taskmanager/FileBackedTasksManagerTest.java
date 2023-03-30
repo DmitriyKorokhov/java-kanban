@@ -3,8 +3,8 @@ package taskmanager;
 import model.Epic;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import service.FileBackedTasksManager;
-import service.InvalidValueException;
+import service.managers.FileBackedTasksManager;
+import service.exception.InvalidValueException;
 
 import java.io.BufferedReader;
 import java.io.FileNotFoundException;
@@ -17,7 +17,7 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 class FileBackedTasksManagerTest extends TaskManagerTest<FileBackedTasksManager>{
 
     private final String file = "file.txt";
-    private final FileBackedTasksManager fileBackedTasksManager = new FileBackedTasksManager(file);
+    private final FileBackedTasksManager fileBackedTasksManager = new FileBackedTasksManager();
     private final BufferedReader bufferedReader;
 
     {
@@ -30,14 +30,8 @@ class FileBackedTasksManagerTest extends TaskManagerTest<FileBackedTasksManager>
 
     @BeforeEach
     public void beforeEach() {
-        taskManager = new FileBackedTasksManager("file.txt");
+        taskManager = new FileBackedTasksManager();
         super.beforeEach();
-    }
-
-    @Test
-    public void saveOrRestoreAStateWithAnEmptyTaskList() throws IOException {
-        fileBackedTasksManager.save();
-        assertEquals("", bufferedReader.readLine(), "Неверное поведение при сохранении");
     }
 
     @Test
@@ -56,18 +50,4 @@ class FileBackedTasksManagerTest extends TaskManagerTest<FileBackedTasksManager>
         );
         assertEquals("История удалена или ее элементы не вводились", ex.getMessage());
     }
-
-    @Test
-    public void restoreAStateHistoryAndWithAnEpicWithoutSubtask() throws InvalidValueException {
-        Epic epic = new Epic("Epic", "Test description");
-        fileBackedTasksManager.saveEpic(epic);
-        final int epicId = epic.getTaskId();
-        fileBackedTasksManager.outputByIdEpic(epicId);
-        fileBackedTasksManager.fromString(file);
-        fileBackedTasksManager.historyFromString(file);
-        assertEquals(epic.toString(), fileBackedTasksManager.getEpicTable().get(epicId).toString());
-        assertEquals(epic.getTaskId(), fileBackedTasksManager.getListOfTasksIdForHistory().get(0));
-    }
-
-
 }

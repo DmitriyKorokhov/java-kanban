@@ -1,9 +1,11 @@
-package service;
+package service.managers;
 
 import model.Epic;
 import model.Status;
 import model.Subtask;
 import model.Task;
+import service.exception.InvalidValueException;
+import service.exception.TimeIntersectionException;
 
 import java.time.LocalDateTime;
 import java.util.*;
@@ -11,9 +13,9 @@ import java.util.*;
 public class InMemoryTaskManager implements TaskManager {
     private int taskId = 0;
     private final HistoryManager historyManager = Managers.getDefaultHistory();
-    private final HashMap<Integer, Subtask> subtaskTable = new HashMap<>();
-    private final HashMap<Integer, Epic> epicTable = new HashMap<>();
-    private final HashMap<Integer, Task> taskTable = new HashMap<>();
+    protected final HashMap<Integer, Subtask> subtaskTable = new HashMap<>();
+    protected final HashMap<Integer, Epic> epicTable = new HashMap<>();
+    protected final HashMap<Integer, Task> taskTable = new HashMap<>();
     private final HashMap<Integer, ArrayList<Integer>> mapIdSubtaskByEpic = new HashMap<>();
     private final HashMap<Integer, Status> mapStatusSubtask = new HashMap<>();
     private final ArrayList<Integer> listOfTasksIdForHistory = new ArrayList<>();
@@ -28,7 +30,7 @@ public class InMemoryTaskManager implements TaskManager {
             return -1;
         }
     };
-    private final Set<Task> prioritizedTasks = new TreeSet<>(comparator);
+    protected final Set<Task> prioritizedTasks = new TreeSet<>(comparator);
 
     @Override
     public Set<Task> getPrioritizedTasks() {
@@ -209,15 +211,19 @@ public class InMemoryTaskManager implements TaskManager {
     }
 
     @Override
-    public void saveSubtask(Subtask subtask, Epic epic, ArrayList<Integer> epicListId) throws TimeIntersectionException {
+    public void saveSubtask(Subtask subtask, int epicId) throws TimeIntersectionException {
         checkIntersections(subtask);
-        mapIdSubtaskByEpic.put(epic.getTaskId(), epicListId);
+
+        Epic epic = epicTable.get(epicId);
+        ArrayList<Integer> epicListId = new ArrayList<>();
+
+        mapIdSubtaskByEpic.put(epicId, epicListId);
         mapStatusSubtask.put(taskId, subtask.getSubtaskStatus());
         subtask.setTaskId(taskId);
         epicListId.add(taskId);
         epic.setEpicListId(epicListId);
         subtaskTable.put(subtask.getTaskId(), subtask);
-        subtask.setIdEpic(epic.getTaskId());
+        subtask.setIdEpic(epicId);
         LocalDateTime startTime = LocalDateTime.MAX;
         LocalDateTime endTime = LocalDateTime.MIN;
         for (Map.Entry<Integer, Subtask> subtaskEntryForTime : subtaskTable.entrySet()) {
@@ -412,6 +418,40 @@ public class InMemoryTaskManager implements TaskManager {
             }
         }
         historyManager.remove(id);
+    }
+
+    @Override
+    public List<Subtask> getSubTasksByEpicId(int id) throws InvalidValueException {
+        if (epicTable.containsKey(id)) {
+            Epic epic = epicTable.get(id);
+            int epicId = epic.getTaskId();
+            ArrayList<Subtask> subtasks = new ArrayList<>();
+            ArrayList<Integer> subtaskId = mapIdSubtaskByEpic.get(epicId);
+            for (Map.Entry<Integer, Subtask> subtaskEntry : subtaskTable.entrySet()) {
+                for (Integer integer : subtaskId) {
+                    if (integer.equals(subtaskEntry.getKey())) {
+                        subtasks.add(subtaskEntry.getValue());
+                    }
+                }
+            }
+            return subtasks;
+        }
+        throw new InvalidValueException("Подзадача с данным id удалена или не вводилась");
+    }
+
+    @Override
+    public Collection<Task> getListTasks() {
+        return taskTable.values();
+    }
+
+    @Override
+    public Collection<Epic> getListEpics() {
+        return epicTable.values();
+    }
+
+    @Override
+    public Collection<Subtask> getListSubtasks() {
+        return subtaskTable.values();
     }
 
     public HashMap<Integer, Subtask> getSubtaskTable() {

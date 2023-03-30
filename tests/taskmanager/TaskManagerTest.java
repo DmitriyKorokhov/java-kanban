@@ -6,17 +6,16 @@ import model.Subtask;
 import model.Task;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import service.InvalidValueException;
-import service.TaskManager;
-import service.TimeIntersectionException;
+import service.exception.InvalidValueException;
+import service.managers.TaskManager;
+import service.exception.TimeIntersectionException;
 
 import java.time.Duration;
 import java.time.LocalDateTime;
 import java.time.Month;
 
 import static org.junit.jupiter.api.Assertions.*;
-
-abstract class TaskManagerTest <T extends TaskManager> {
+public abstract class TaskManagerTest <T extends TaskManager> {
     protected T taskManager;
 
     @BeforeEach
@@ -277,7 +276,7 @@ abstract class TaskManagerTest <T extends TaskManager> {
         taskManager.saveEpic(epicOne);
         final int epicId = epicOne.getTaskId();
         Subtask subtaskForEpicOne = new Subtask("Testing the EpicOne", "Test description", epicId);
-        taskManager.saveSubtask(subtaskForEpicOne, epicOne, epicOne.getEpicListId());
+        taskManager.saveSubtask(subtaskForEpicOne, epicOne.getTaskId());
         final int subtaskId = subtaskForEpicOne.getTaskId();
         Epic epicTwo = new Epic("Testing the EpicTwo", "Test description");
         taskManager.saveEpic(epicTwo);
@@ -354,7 +353,7 @@ abstract class TaskManagerTest <T extends TaskManager> {
         Epic epic = new Epic("Epic", "Test description");
         taskManager.saveEpic(epic);
         Subtask subtask = new Subtask("Testing the Subtask", "Test description", epic.getTaskId());
-        taskManager.saveSubtask(subtask, epic, epic.getEpicListId());
+        taskManager.saveSubtask(subtask, epic.getTaskId());
         final int subtaskId = subtask.getTaskId();
         final Subtask savedSubtask = taskManager.getSubtaskTable().get(subtaskId);
         assertNotNull(savedSubtask, "Подзадача не найдена.");
@@ -375,7 +374,7 @@ abstract class TaskManagerTest <T extends TaskManager> {
         Epic epic = new Epic("Epic", "Test description");
         taskManager.saveEpic(epic);
         Subtask subtask = new Subtask("Testing the Subtask", "Test description", epic.getTaskId());
-        taskManager.saveSubtask(subtask, epic, epic.getEpicListId());
+        taskManager.saveSubtask(subtask, epic.getTaskId());
         assertEquals(Status.NEW, subtask.getSubtaskStatus());
         LocalDateTime subtask1StartTime = LocalDateTime.of(2023, Month.DECEMBER, 3, 11, 11);
         Duration subtask1Duration = Duration.ofHours(20);
@@ -411,10 +410,10 @@ abstract class TaskManagerTest <T extends TaskManager> {
         Epic epic = new Epic("Epic", "Test description");
         taskManager.saveEpic(epic);
         Subtask subtaskOne = new Subtask("Testing the SubtaskOne", "Test description - 1", epic.getTaskId());
-        taskManager.saveSubtask(subtaskOne, epic, epic.getEpicListId());
+        taskManager.saveSubtask(subtaskOne, epic.getTaskId());
         final int id = subtaskOne.getTaskId();
         Subtask subtaskTwo = new Subtask("Testing the SubtaskTwo", "Test description - 2", epic.getTaskId());
-        taskManager.saveSubtask(subtaskTwo, epic, epic.getEpicListId());
+        taskManager.saveSubtask(subtaskTwo, epic.getTaskId());
         taskManager.clearByIdSubtasks(subtaskOne.getTaskId());
         final Subtask savedSubtask = taskManager.getSubtaskTable().get(id);
         assertNull(savedSubtask, "Подзадача найдена.");
@@ -437,7 +436,7 @@ abstract class TaskManagerTest <T extends TaskManager> {
         Epic epic = new Epic("Epic", "Test description");
         taskManager.saveEpic(epic);
         Subtask subtask = new Subtask("Testing the Subtask", "Test description", epic.getTaskId());
-        taskManager.saveSubtask(subtask, epic, epic.getEpicListId());
+        taskManager.saveSubtask(subtask, epic.getTaskId());
         final int id = 0;
         final Subtask savedSubtask = taskManager.getSubtaskTable().get(id);
         InvalidValueException ex = assertThrows(InvalidValueException.class, () -> taskManager.clearByIdSubtasks(id));
@@ -451,7 +450,7 @@ abstract class TaskManagerTest <T extends TaskManager> {
         Epic epic = new Epic("Epic", "Test description");
         taskManager.saveEpic(epic);
         Subtask subtask = new Subtask("Testing the Subtask", "Test description", epic.getTaskId());
-        taskManager.saveSubtask(subtask, epic, epic.getEpicListId());
+        taskManager.saveSubtask(subtask, epic.getTaskId());
         taskManager.clearAllSubtasks();
         assertEquals("{}", taskManager.getSubtaskTable().toString());
     }
@@ -461,9 +460,9 @@ abstract class TaskManagerTest <T extends TaskManager> {
         Epic epic = new Epic("Epic", "Test description");
         taskManager.saveEpic(epic);
         Subtask subtaskOne = new Subtask("Testing the SubtaskOne", "Test description - 1", epic.getTaskId());
-        taskManager.saveSubtask(subtaskOne, epic, epic.getEpicListId());
+        taskManager.saveSubtask(subtaskOne, epic.getTaskId());
         Subtask subtaskTwo = new Subtask("Testing the SubtaskTwo", "Test description - 2", epic.getTaskId());
-        taskManager.saveSubtask(subtaskTwo, epic, epic.getEpicListId());
+        taskManager.saveSubtask(subtaskTwo, epic.getTaskId());
         final int id = subtaskTwo.getTaskId();
         taskManager.outputByIdSubtasks(id);
         assertEquals(id, taskManager.getListOfTasksIdForHistory().get(0));
@@ -482,7 +481,7 @@ abstract class TaskManagerTest <T extends TaskManager> {
         Epic epic = new Epic("Epic", "Test description");
         taskManager.saveEpic(epic);
         Subtask subtask = new Subtask("Testing the Subtask", "Test description", epic.getTaskId());
-        taskManager.saveSubtask(subtask, epic, epic.getEpicListId());
+        taskManager.saveSubtask(subtask, epic.getTaskId());
         final int id = 2;
         InvalidValueException ex = assertThrows(InvalidValueException.class, () -> taskManager.outputByIdSubtasks(id));
         assertEquals("Подзадача с данным id удалена или не вводилась", ex.getMessage());
@@ -494,7 +493,7 @@ abstract class TaskManagerTest <T extends TaskManager> {
         Epic epic = new Epic("Epic", "Test description");
         taskManager.saveEpic(epic);
         Subtask subtask = new Subtask("Testing the Subtask", "Test description", epic.getTaskId());
-        taskManager.saveSubtask(subtask, epic, epic.getEpicListId());
+        taskManager.saveSubtask(subtask, epic.getTaskId());
         final int idSubtask = subtask.getTaskId();
         assertTrue(epic.getEpicListId().contains(idSubtask), "Наличие эпика у подзадачи не обнаружено.");
     }
@@ -505,7 +504,7 @@ abstract class TaskManagerTest <T extends TaskManager> {
         taskManager.saveEpic(epic);
         final int epicId = epic.getTaskId();
         Subtask subtask = new Subtask("Testing the Subtask", "Test description", epic.getTaskId());
-        taskManager.saveSubtask(subtask, epic, epic.getEpicListId());
+        taskManager.saveSubtask(subtask, epic.getTaskId());
         final int idSubtask = subtask.getTaskId();
         taskManager.clearByIdEpic(epicId);
         assertFalse(taskManager.getSubtaskTable().containsKey(idSubtask), "Подзадача обнаружена.");
@@ -516,7 +515,7 @@ abstract class TaskManagerTest <T extends TaskManager> {
         Epic epic = new Epic("Epic", "Test description");
         taskManager.saveEpic(epic);
         Subtask subtask = new Subtask("Testing the Subtask", "Test description", epic.getTaskId());
-        taskManager.saveSubtask(subtask, epic, epic.getEpicListId());
+        taskManager.saveSubtask(subtask, epic.getTaskId());
         int subtaskId = subtask.getTaskId();
         assertEquals(Status.NEW, epic.getEpicStatus(), "Неверный статус у эпика");
         subtask = new Subtask(subtaskId, "Testing the Subtask", "Test description - 1");

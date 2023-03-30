@@ -46,6 +46,17 @@ public class Task {
         setTaskEndTime(taskStartTime.plus(taskDuration));
     }
 
+    public Task(int taskId, TypesOfTasks type, Status taskStatus, String taskTitle, String taskSpecification, LocalDateTime taskStartTime, Duration taskDuration) {
+        this.taskId = taskId;
+        this.taskTitle = taskTitle;
+        this.taskSpecification = taskSpecification;
+        this.taskStartTime = taskStartTime;
+        this.taskDuration = taskDuration;
+        this.taskType = type;
+        this.taskStatus = taskStatus;
+        setTaskEndTime(taskStartTime.plus(taskDuration));
+    }
+
     public LocalDateTime getTaskStartTime() {
         return taskStartTime;
     }
@@ -70,11 +81,11 @@ public class Task {
         this.taskDuration = taskDuration;
     }
 
-    public void setTaskType(TypesOfTasks taskType) {
-        this.taskType = taskType;
+    public void setType(TypesOfTasks type) {
+        this.taskType = type;
     }
 
-    public TypesOfTasks getTaskType() {
+    public TypesOfTasks getType() {
         return taskType;
     }
 

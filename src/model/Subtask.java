@@ -8,8 +8,8 @@ public class Subtask extends Task{
     private TypesOfTasks subtaskType;
     private int idEpic;
 
-    public Subtask(String mainTask, String mainSpecification, int idEpic) {
-        super(mainTask, mainSpecification);
+    public Subtask(String taskTitle, String taskSpecification, int idEpic) {
+        super(taskTitle, taskSpecification);
         subtaskStatus = Status.NEW;
         subtaskType = TypesOfTasks.SUBTASK;
         this.idEpic = idEpic;
@@ -71,11 +71,11 @@ public class Subtask extends Task{
         this.idEpic = idEpic;
     }
 
-    public void setSubtaskType(TypesOfTasks subtaskType) {
-        this.subtaskType = subtaskType;
+    public void setType(TypesOfTasks type) {
+        this.subtaskType = type;
     }
 
-    public TypesOfTasks getSubtaskType() {
+    public TypesOfTasks getType() {
         return subtaskType;
     }
 
@@ -85,11 +85,6 @@ public class Subtask extends Task{
 
     public void setSubtaskStatus(Status subtaskStatus) {
         this.subtaskStatus = subtaskStatus;
-    }
-
-    @Override
-    public TypesOfTasks getTaskType() {
-        return subtaskType;
     }
 
     @Override
