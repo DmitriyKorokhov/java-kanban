@@ -20,26 +20,26 @@ public class InMemoryHistoryManager implements HistoryManager {
             if (lastNode == null)
                 first = newNode;
             else
-                lastNode.next = newNode;
+                lastNode.setNext(newNode);
                 nodeMap.put(task.getTaskId(), newNode);
         }
 
         public void removeNode(Node node) {
-            final Node next = node.next;
-            final Node prev = node.prev;
+            final Node next = node.getNext();
+            final Node prev = node.getPrev();
             if (prev == null) {
                 first = next;
             } else {
-                prev.next = next;
-                node.prev = null;
+                prev.setNext(next);
+                node.setPrev(null);
             }
             if (next == null) {
                 last = prev;
             } else {
-                next.prev = prev;
-                node.next = null;
+                next.setPrev(prev);
+                node.setNext(null);
             }
-            node.item = null;
+            node.setItem(null);
         }
 
         public List<Task> getTasks() throws InvalidValueException {
@@ -51,12 +51,12 @@ public class InMemoryHistoryManager implements HistoryManager {
                 while (currentNode != null) {
                     if (historyManager.size() == 10) {
                         historyManager.remove(0);
-                        historyManager.add(currentNode.item);
+                        historyManager.add(currentNode.getItem());
                     } else {
-                        historyManager.add(currentNode.item);
+                        historyManager.add(currentNode.getItem());
                     }
                     historyManager.size();
-                    currentNode = currentNode.next;
+                    currentNode = currentNode.getNext();
                 }
             }
             return historyManager;

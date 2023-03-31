@@ -49,6 +49,12 @@ public class Main {
         } catch (InvalidValueException e) {
            System.out.println(e.getMessage());
         }
+        System.out.println("Получить history");
+        try {
+            System.out.println(taskManager.getHistory());
+        } catch (InvalidValueException e) {
+            System.out.println(e.getMessage());
+        }
         System.out.println("Получить список всех задач\n" + taskManager.getListSubtasks());
         System.out.println("Получить список всех эпиков\n" + taskManager.getListEpics());
         System.out.println("Получить список всех задач\n" + taskManager.getListTasks());

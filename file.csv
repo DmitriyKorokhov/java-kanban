@@ -1,2 +1,4 @@
-0,EPIC,Epic,NEW,Test description,indefinitely
+0,EPIC,Testing the Epic,NEW,Test description,indefinitely
+1,SUBTASK,Subtask1,NEW,Test description - 1,0,indefinitely
+2,SUBTASK,Subtask2,NEW,Test description - 2,0,indefinitely
 
