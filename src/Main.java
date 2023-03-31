@@ -59,8 +59,8 @@ public class Main {
         System.out.println("====");
         HttpTaskServer taskServer = Managers.getDefaultHttpTaskServer(taskManager);
         taskServer.startTaskServer();
-        System.out.println("Для завершения нажмите 0");
-        if ((new Scanner(System.in)).nextInt() == 0) {
+        System.out.println("Для завершения нажмите 1");
+        if ((new Scanner(System.in)).nextInt() == 1) {
             taskServer.stopTaskServer();
             kvServer.stop();
         }

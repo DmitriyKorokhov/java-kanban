@@ -70,7 +70,7 @@ public class HttpTaskManager extends FileBackedTasksManager {
         System.out.println("HttpTaskManager: задачи сохранены на KVTaskClient");
     }
 
-    public void loadFromHttp() throws IOException, InterruptedException {
+    private void loadFromHttp() throws IOException, InterruptedException {
         JsonElement jsonTasks = JsonParser.parseString(client.load("tasks"));
         JsonElement jsonHistoryList;
         if (!jsonTasks.isJsonNull()) {
