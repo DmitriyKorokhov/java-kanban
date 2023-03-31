@@ -18,6 +18,8 @@ import service.adapters.DurationTypeAdapter;
 import service.adapters.LocalDateTimeConverter;
 import service.exception.InvalidValueException;
 
+import static service.handler.HandlerAbstractTask.createResponse;
+
 public class HttpTaskManager extends FileBackedTasksManager {
     private final KVTaskClient client;
     private static final Gson gson = new GsonBuilder().registerTypeAdapter(Duration.class, new DurationTypeAdapter())
@@ -36,35 +38,25 @@ public class HttpTaskManager extends FileBackedTasksManager {
         try {
         String task = gson.toJson(getListTasks());
         client.put("tasks", task);
-        } catch (IOException e) {
-            System.out.println(e.getMessage());
-        } catch (InterruptedException e) {
+        } catch (IOException | InterruptedException e) {
             System.out.println(e.getMessage());
         }
         try {
         String subtask = gson.toJson(getListSubtasks());
         client.put("subtasks", subtask);
-        } catch (IOException e) {
-            System.out.println(e.getMessage());
-        } catch (InterruptedException e) {
+        } catch (IOException | InterruptedException e) {
             System.out.println(e.getMessage());
         }
         try {
         String epic = gson.toJson(getListEpics());
         client.put("epics", epic);
-        } catch (IOException e) {
-            System.out.println(e.getMessage());
-        } catch (InterruptedException e) {
+        } catch (IOException | InterruptedException e) {
             System.out.println(e.getMessage());
         }
         try {
         String history =  gson.toJson(getHistory());
         client.put("history", history);
-        } catch (IOException e) {
-            System.out.println(e.getMessage());
-        } catch (InterruptedException e) {
-            System.out.println(e.getMessage());
-        } catch (InvalidValueException e) {
+        } catch (IOException | InterruptedException | InvalidValueException e) {
             System.out.println(e.getMessage());
         }
         System.out.println("HttpTaskManager: задачи сохранены на KVTaskClient");
@@ -80,8 +72,8 @@ public class HttpTaskManager extends FileBackedTasksManager {
                 jsonHistoryList = (JsonElement)iterator.next();
                 Task task = (Task)gson.fromJson(jsonHistoryList, Task.class);
                 int taskID = task.getTaskId();
-                this.taskTable.put(taskID, task);
-                this.prioritizedTasks.add(task);
+                taskTable.put(taskID, task);
+                prioritizedTasks.add(task);
             }
         }
         JsonElement jsonEpics = JsonParser.parseString(client.load("epics"));
@@ -111,6 +103,7 @@ public class HttpTaskManager extends FileBackedTasksManager {
             JsonArray jsonHistoryArray = jsonHistoryList.getAsJsonArray();
             Iterator iterator = jsonHistoryArray.iterator();
             while(iterator.hasNext()) {
+                // возвращает элемент Array json, чтобы получить id
                 JsonElement jsonTaskId = (JsonElement)iterator.next();
                 int taskId = jsonTaskId.getAsInt();
                 if (taskTable.containsKey(taskId)) {

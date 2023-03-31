@@ -6,10 +6,10 @@ import service.server.KVServer;
 import java.io.IOException;
 
 public class Managers {
-    private static final String uri = "http://localhost:8078";
+    private static final String URI = "http://localhost:8078";
 
     public static HttpTaskManager getDefaultHttpTaskManager() throws IOException, InterruptedException {
-        return new HttpTaskManager(uri);
+        return new HttpTaskManager(URI);
     }
 
     public static InMemoryHistoryManager getDefaultHistory() {

@@ -5,6 +5,7 @@ import static java.nio.charset.StandardCharsets.UTF_8;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.net.InetSocketAddress;
+import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
 import java.util.HashMap;
 import java.util.Map;
@@ -16,6 +17,7 @@ import com.sun.net.httpserver.HttpServer;
  * Постман: https://www.getpostman.com/collections/a83b61d9e1c81c10575c
  */
 public class KVServer {
+    private static final Charset DEFAULT_CHARSET = StandardCharsets.UTF_8;
     public static final int PORT = 8078;
     private final String apiToken;
     private final HttpServer server;
@@ -46,7 +48,7 @@ public class KVServer {
                 }
                 System.out.println("Значение ключа " + key + ":");
                 System.out.println(data.get(key));
-                h.sendResponseHeaders(200, 0);
+                writeResponse(h, data.get(key), 200);
             } else {
                 System.out.println("/save ждёт POST-запрос, а получил: " + h.getRequestMethod());
                 h.sendResponseHeaders(405, 0);
@@ -133,5 +135,20 @@ public class KVServer {
         h.getResponseHeaders().add("Content-Type", "application/json");
         h.sendResponseHeaders(200, resp.length);
         h.getResponseBody().write(resp);
+    }
+
+    private void writeResponse(HttpExchange exchange,
+                               String responseString,
+                               int responseCode) throws IOException {
+        if(responseString.isBlank()) {
+            exchange.sendResponseHeaders(responseCode, 0);
+        } else {
+            byte[] bytes = responseString.getBytes(DEFAULT_CHARSET);
+            exchange.sendResponseHeaders(responseCode, bytes.length);
+            try (OutputStream os = exchange.getResponseBody()) {
+                os.write(bytes);
+            }
+        }
+        exchange.close();
     }
 }

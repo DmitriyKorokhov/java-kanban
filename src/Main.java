@@ -1,11 +1,7 @@
-import com.google.gson.Gson;
-import com.google.gson.GsonBuilder;
 import model.Epic;
 import model.Subtask;
 import model.Task;
 import model.TypesOfTasks;
-import service.adapters.DurationTypeAdapter;
-import service.adapters.LocalDateTimeConverter;
 import service.exception.InvalidValueException;
 import service.exception.TimeIntersectionException;
 import service.managers.HttpTaskManager;
@@ -21,7 +17,7 @@ import java.util.Scanner;
 
 
 public class Main {
-    public static void main(String[] args) throws TimeIntersectionException, IOException, InterruptedException, InvalidValueException {
+    public static void main(String[] args) throws TimeIntersectionException, IOException, InterruptedException {
         System.out.println("Это программа Трекер задач");
         KVServer kvServer = Managers.getDefaultKVServer();
         kvServer.start();

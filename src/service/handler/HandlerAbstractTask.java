@@ -62,8 +62,7 @@ public abstract class HandlerAbstractTask implements HttpHandler {
 
     public String bodyRequest(HttpExchange httpExchange) {
         try {
-            String body = new String(httpExchange.getRequestBody().readAllBytes(), DEFAULT_CHARSET);
-            return body;
+            return new String(httpExchange.getRequestBody().readAllBytes(), DEFAULT_CHARSET);
         } catch (IOException e) {
             throw new RuntimeException(e);
         }

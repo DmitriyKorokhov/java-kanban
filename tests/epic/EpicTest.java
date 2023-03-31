@@ -9,7 +9,6 @@ import service.managers.Managers;
 import service.managers.TaskManager;
 import service.exception.TimeIntersectionException;
 
-import static org.junit.jupiter.api.Assertions.*;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 class EpicTest {

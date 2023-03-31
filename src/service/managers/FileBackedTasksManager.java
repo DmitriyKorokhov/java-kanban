@@ -15,7 +15,7 @@ import java.time.*;
 import java.util.*;
 
 public class FileBackedTasksManager extends InMemoryTaskManager implements TaskManager {
-    private final String file = "file.csv";
+    private final String FILE = "file.csv";
 
     public static FileBackedTasksManager loadFromFile(String file){
         try {
@@ -30,7 +30,7 @@ public class FileBackedTasksManager extends InMemoryTaskManager implements TaskM
 
     public void save(){
         try {
-            FileWriter fileWriter = new FileWriter(file, StandardCharsets.UTF_8);
+            FileWriter fileWriter = new FileWriter(FILE, StandardCharsets.UTF_8);
             BufferedWriter bufferedWriter = new BufferedWriter(fileWriter);
 
             for (Integer key : getTaskTable().keySet()) {

@@ -10,6 +10,7 @@ import java.util.*;
 
 public interface TaskManager {
     Set<Task> getPrioritizedTasks();
+    
     void saveTask(Task task) throws TimeIntersectionException;
 
     void updateTask(Task task) throws InvalidValueException, TimeIntersectionException;

@@ -57,9 +57,7 @@ public class HandlerEpic extends HandlerAbstractTask {
             }
         } catch (JsonSyntaxException e) {
             createResponse(httpExchange, "Недопустимый синтаксис Json в запросе", 404);
-        } catch (InvalidValueException e) {
-            System.out.println(e.getMessage());
-        } catch (TimeIntersectionException e) {
+        } catch (InvalidValueException | TimeIntersectionException e) {
             System.out.println(e.getMessage());
         }
     }
