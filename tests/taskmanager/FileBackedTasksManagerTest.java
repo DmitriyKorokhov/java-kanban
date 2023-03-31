@@ -29,7 +29,7 @@ class FileBackedTasksManagerTest extends TaskManagerTest<FileBackedTasksManager>
     }
 
     @BeforeEach
-    public void beforeEach() {
+    public void beforeEach() throws IOException, InterruptedException {
         taskManager = new FileBackedTasksManager();
         super.beforeEach();
     }

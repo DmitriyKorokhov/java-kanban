@@ -16,7 +16,7 @@ public class Managers {
         return new InMemoryHistoryManager();
     }
 
-    public static TaskManager getDefaultFileBackedTasksManager() {
+    public static FileBackedTasksManager getDefaultFileBackedTasksManager() {
         return new FileBackedTasksManager();
     }
 
@@ -24,7 +24,7 @@ public class Managers {
         return new KVServer();
     }
 
-    public static HttpTaskServer getDefaultHttpTaskServer(HttpTaskManager taskManager) throws IOException {
+    public static HttpTaskServer getDefaultHttpTaskServer(HttpTaskManager taskManager) throws IOException, InterruptedException {
         return new HttpTaskServer(taskManager);
     }
 

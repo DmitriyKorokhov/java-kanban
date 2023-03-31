@@ -23,8 +23,6 @@ import java.util.Scanner;
 public class Main {
     public static void main(String[] args) throws TimeIntersectionException, IOException, InterruptedException, InvalidValueException {
         System.out.println("Это программа Трекер задач");
-        Gson gson = new GsonBuilder().registerTypeAdapter(Duration.class, new DurationTypeAdapter())
-                .registerTypeAdapter(LocalDateTime.class, new LocalDateTimeConverter()).create();
         KVServer kvServer = Managers.getDefaultKVServer();
         kvServer.start();
         HttpTaskManager taskManager = Managers.getDefaultHttpTaskManager();
@@ -53,16 +51,12 @@ public class Main {
         try {
             taskManager.outputByIdTask(0);
         } catch (InvalidValueException e) {
-            throw new RuntimeException(e);
+           System.out.println(e.getMessage());
         }
         System.out.println("Получить список всех задач\n" + taskManager.getListSubtasks());
         System.out.println("Получить список всех эпиков\n" + taskManager.getListEpics());
         System.out.println("Получить список всех задач\n" + taskManager.getListTasks());
         System.out.println("====");
-
-        System.out.println(gson.toJson(taskOne, Task.class));
-        System.out.println(gson.toJson(epicOne, Epic.class));
-        System.out.println(gson.toJson(taskManager.getHistory()));
         HttpTaskServer taskServer = Managers.getDefaultHttpTaskServer(taskManager);
         taskServer.startTaskServer();
         System.out.println("Для завершения нажмите 0");

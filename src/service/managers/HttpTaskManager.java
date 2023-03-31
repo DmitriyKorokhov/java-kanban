@@ -8,6 +8,7 @@ import com.google.gson.JsonParser;
 import java.io.IOException;
 import java.time.Duration;
 import java.time.LocalDateTime;
+import java.util.Iterator;
 
 import model.Epic;
 import model.Subtask;
@@ -35,10 +36,28 @@ public class HttpTaskManager extends FileBackedTasksManager {
         try {
         String task = gson.toJson(getListTasks());
         client.put("tasks", task);
+        } catch (IOException e) {
+            System.out.println(e.getMessage());
+        } catch (InterruptedException e) {
+            System.out.println(e.getMessage());
+        }
+        try {
         String subtask = gson.toJson(getListSubtasks());
         client.put("subtasks", subtask);
+        } catch (IOException e) {
+            System.out.println(e.getMessage());
+        } catch (InterruptedException e) {
+            System.out.println(e.getMessage());
+        }
+        try {
         String epic = gson.toJson(getListEpics());
         client.put("epics", epic);
+        } catch (IOException e) {
+            System.out.println(e.getMessage());
+        } catch (InterruptedException e) {
+            System.out.println(e.getMessage());
+        }
+        try {
         String history =  gson.toJson(getHistory());
         client.put("history", history);
         } catch (IOException e) {
@@ -51,45 +70,55 @@ public class HttpTaskManager extends FileBackedTasksManager {
         System.out.println("HttpTaskManager: задачи сохранены на KVTaskClient");
     }
 
-    private void loadFromHttp() throws IOException, InterruptedException {
-        JsonElement jsonElementForTask = JsonParser.parseString(client.load("tasks"));
-        if (jsonElementForTask != null) {
-            JsonArray arrayTask = jsonElementForTask.getAsJsonArray();
-            for (JsonElement jsonTsk : arrayTask) {
-                Task task = gson.fromJson(jsonTsk, Task.class);
-                taskTable.put(task.getTaskId(), task);
+    public void loadFromHttp() throws IOException, InterruptedException {
+        JsonElement jsonTasks = JsonParser.parseString(client.load("tasks"));
+        JsonElement jsonHistoryList;
+        if (!jsonTasks.isJsonNull()) {
+            JsonArray jsonTasksArray = jsonTasks.getAsJsonArray();
+            Iterator iterator = jsonTasksArray.iterator();
+            while(iterator.hasNext()) {
+                jsonHistoryList = (JsonElement)iterator.next();
+                Task task = (Task)gson.fromJson(jsonHistoryList, Task.class);
+                int taskID = task.getTaskId();
+                this.taskTable.put(taskID, task);
+                this.prioritizedTasks.add(task);
+            }
+        }
+        JsonElement jsonEpics = JsonParser.parseString(client.load("epics"));
+        if (!jsonEpics.isJsonNull()) {
+            JsonArray jsonEpicsArray = jsonEpics.getAsJsonArray();
+            Iterator iterator = jsonEpicsArray.iterator();
+            while(iterator.hasNext()) {
+                JsonElement jsonEpic = (JsonElement)iterator.next();
+                Epic task = (Epic)gson.fromJson(jsonEpic, Epic.class);
+                int taskID = task.getTaskId();
+                epicTable.put(taskID, task);
+            }
+        }
+        JsonElement jsonSubtasks = JsonParser.parseString(client.load("subtasks"));
+        if (!jsonSubtasks.isJsonNull()) {
+            JsonArray jsonSubtasksArray = jsonSubtasks.getAsJsonArray();
+            Iterator iterator = jsonSubtasksArray.iterator();
+            while(iterator.hasNext()) {
+                JsonElement jsonSubtask = (JsonElement)iterator.next();
+                Subtask task = (Subtask)gson.fromJson(jsonSubtask, Subtask.class);
+                subtaskTable.put(task.getTaskId(), task);
                 prioritizedTasks.add(task);
             }
         }
-        JsonElement jsonElementForEpic = JsonParser.parseString(client.load("epics"));
-        if (jsonElementForEpic != null) {
-            JsonArray arrayEpic = jsonElementForEpic.getAsJsonArray();
-            for (JsonElement jsonTsk : arrayEpic) {
-                Epic epic = gson.fromJson(jsonTsk, Epic.class);
-                epicTable.put(epic.getTaskId(), epic);
-            }
-        }
-        JsonElement jsonElementForSubtask = JsonParser.parseString(client.load("subtasks"));
-        if (jsonElementForSubtask != null) {
-            JsonArray arraySubtask = jsonElementForSubtask.getAsJsonArray();
-            for (JsonElement jsonTsk : arraySubtask) {
-                Subtask subtask = gson.fromJson(jsonTsk, Subtask.class);
-                subtaskTable.put(subtask.getTaskId(), subtask);
-                prioritizedTasks.add(subtask);
-            }
-        }
-        JsonElement jsonHistoryList = JsonParser.parseString(this.client.load("history"));
-        if (jsonHistoryList != null) {
+        jsonHistoryList = JsonParser.parseString(client.load("history"));
+        if (!jsonHistoryList.isJsonNull()) {
             JsonArray jsonHistoryArray = jsonHistoryList.getAsJsonArray();
-            for (JsonElement jsonElement : jsonHistoryArray) {
-                JsonElement jsonTaskId = jsonElement;
+            Iterator iterator = jsonHistoryArray.iterator();
+            while(iterator.hasNext()) {
+                JsonElement jsonTaskId = (JsonElement)iterator.next();
                 int taskId = jsonTaskId.getAsInt();
-                if (this.subtaskTable.containsKey(taskId)) {
-                    this.getHistoryManager().add(subtaskTable.get(taskId));
-                } else if (this.epicTable.containsKey(taskId)) {
-                    this.getHistoryManager().add(epicTable.get(taskId));
-                } else if (this.taskTable.containsKey(taskId)) {
-                    this.getHistoryManager().add(taskTable.get(taskId));
+                if (taskTable.containsKey(taskId)) {
+                    getHistoryManager().add(taskTable.get(taskId));
+                } else if (epicTable.containsKey(taskId)) {
+                    getHistoryManager().add(epicTable.get(taskId));
+                } else if (subtaskTable.containsKey(taskId)) {
+                    getHistoryManager().add(subtaskTable.get(subtaskTable.get(taskId)));
                 }
             }
         }

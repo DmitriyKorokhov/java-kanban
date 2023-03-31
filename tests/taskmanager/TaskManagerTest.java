@@ -10,6 +10,7 @@ import service.exception.InvalidValueException;
 import service.managers.TaskManager;
 import service.exception.TimeIntersectionException;
 
+import java.io.IOException;
 import java.time.Duration;
 import java.time.LocalDateTime;
 import java.time.Month;
@@ -19,7 +20,7 @@ public abstract class TaskManagerTest <T extends TaskManager> {
     protected T taskManager;
 
     @BeforeEach
-    void beforeEach() {
+    protected void beforeEach() throws IOException, InterruptedException {
     }
 
     @Test
